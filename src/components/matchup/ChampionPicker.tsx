@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Search, X } from "lucide-react";
 import { CHAMPIONS } from "@/data/mock-matchup";
 import type { Champion } from "@/types/matchup";
-import type { Role } from "@/types/matchup";
+import { useI18n } from "@/lib/i18n";
 
 interface ChampionPickerProps {
   label: string;
@@ -15,6 +15,7 @@ interface ChampionPickerProps {
 const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPickerProps) => {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const { t } = useI18n();
 
   const filtered = useMemo(() => {
     if (!query) return CHAMPIONS;
@@ -47,7 +48,7 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
           <Search className="w-3.5 h-3.5 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search champion..."
+            placeholder={t("selection.searchChampion")}
             value={query}
             onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
             onFocus={() => setOpen(true)}
@@ -59,7 +60,7 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
       {open && (
         <div className="absolute z-50 top-full mt-1 left-0 right-0 surface-2 border border-border rounded-lg shadow-lg max-h-52 overflow-y-auto">
           {filtered.length === 0 ? (
-            <p className="p-3 text-xs text-muted-foreground text-center">No champions found</p>
+            <p className="p-3 text-xs text-muted-foreground text-center">{t("selection.noChampions")}</p>
           ) : (
             <div className="grid grid-cols-5 gap-0.5 p-1.5">
               {filtered.map((c) => (

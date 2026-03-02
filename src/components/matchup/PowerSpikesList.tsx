@@ -1,16 +1,19 @@
 import { PowerSpike } from "@/types/matchup";
-
-const advantageStyles = {
-  ally: { dot: "bg-advantage", text: "text-advantage", label: "Your advantage" },
-  enemy: { dot: "bg-threat", text: "text-threat", label: "Enemy advantage" },
-  even: { dot: "bg-caution", text: "text-caution", label: "Even" },
-};
+import { useI18n } from "@/lib/i18n";
 
 interface PowerSpikesListProps {
   spikes: PowerSpike[];
 }
 
 const PowerSpikesList = ({ spikes }: PowerSpikesListProps) => {
+  const { t } = useI18n();
+
+  const advantageStyles = {
+    ally: { dot: "bg-advantage", text: "text-advantage", labelKey: "spikes.ally" as const },
+    enemy: { dot: "bg-threat", text: "text-threat", labelKey: "spikes.enemy" as const },
+    even: { dot: "bg-caution", text: "text-caution", labelKey: "spikes.even" as const },
+  };
+
   return (
     <div className="space-y-2">
       {spikes.map((spike, i) => {
@@ -23,7 +26,7 @@ const PowerSpikesList = ({ spikes }: PowerSpikesListProps) => {
             </span>
             <span className="text-xs text-foreground/80 flex-1">{spike.description}</span>
             <span className={`text-[10px] font-bold uppercase tracking-wider shrink-0 ${style.text}`}>
-              {style.label}
+              {t(style.labelKey)}
             </span>
           </div>
         );

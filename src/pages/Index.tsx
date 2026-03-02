@@ -3,6 +3,7 @@ import { Swords, Loader2 } from "lucide-react";
 import type { Role, Champion, MatchupPlan } from "@/types/matchup";
 import { MOCK_PLAN } from "@/data/mock-matchup";
 import { MOCK_JUNGLE_PLAN } from "@/data/mock-jungle-matchup";
+import { useI18n, type Locale } from "@/lib/i18n";
 
 import HeroBanner from "@/components/matchup/HeroBanner";
 import RoleSelector from "@/components/matchup/RoleSelector";
@@ -11,12 +12,18 @@ import MatchupHeader from "@/components/matchup/MatchupHeader";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
 import JungleAnalysisView from "@/components/matchup/JungleAnalysisView";
 
+const langOptions: { value: Locale; flag: string; label: string }[] = [
+  { value: "pt", flag: "🇧🇷", label: "PT" },
+  { value: "en", flag: "🇺🇸", label: "EN" },
+];
+
 const Index = () => {
   const [role, setRole] = useState<Role | null>(null);
   const [ally, setAlly] = useState<Champion | null>(null);
   const [enemy, setEnemy] = useState<Champion | null>(null);
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<MatchupPlan | null>(null);
+  const { locale, setLocale, t } = useI18n();
 
   const canAnalyze = role && ally && enemy;
 
@@ -25,7 +32,6 @@ const Index = () => {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1200));
     setPlan(role === "jungle" ? MOCK_JUNGLE_PLAN : MOCK_PLAN);
-    setLoading(false);
     setLoading(false);
   };
 
@@ -47,44 +53,61 @@ const Index = () => {
               MATCHUP<span className="text-brand">.GG</span>
             </span>
           </div>
-          <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider">
-            Strategic Coach
-          </span>
+
+          <div className="flex items-center gap-3">
+            {/* Language Switcher */}
+            <div className="flex items-center gap-0.5 surface-2 rounded-md p-0.5">
+              {langOptions.map((lang) => (
+                <button
+                  key={lang.value}
+                  onClick={() => setLocale(lang.value)}
+                  className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold transition-colors ${
+                    locale === lang.value
+                      ? "bg-brand text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <span>{lang.flag}</span>
+                  <span>{lang.label}</span>
+                </button>
+              ))}
+            </div>
+
+            <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider hidden sm:inline">
+              {t("header.subtitle")}
+            </span>
+          </div>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-6 space-y-4">
         {!plan ? (
-          /* ─── SELECTION VIEW ─── */
           <div className="space-y-5">
-            {/* Hero Banner */}
             <HeroBanner />
 
             <div className="text-center space-y-1">
               <h1 className="text-lg font-extrabold text-foreground tracking-tight">
-                Análise de Matchup
+                {t("selection.title")}
               </h1>
               <p className="text-xs text-muted-foreground">
-                Selecione sua role e campeões para gerar um plano estratégico
+                {t("selection.subtitle")}
               </p>
             </div>
 
-            {/* Role Selector */}
             <div className="flex justify-center">
               <RoleSelector selected={role} onSelect={setRole} />
             </div>
 
-            {/* Champion Pickers */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <ChampionPicker
-                label="Your Champion"
+                label={t("selection.yourChampion")}
                 side="ally"
                 selected={ally}
                 onSelect={setAlly}
                 onClear={() => setAlly(null)}
               />
               <ChampionPicker
-                label="Enemy Champion"
+                label={t("selection.enemyChampion")}
                 side="enemy"
                 selected={enemy}
                 onSelect={setEnemy}
@@ -92,7 +115,6 @@ const Index = () => {
               />
             </div>
 
-            {/* Analyze button */}
             <div className="flex justify-center pt-2">
               <button
                 onClick={handleAnalyze}
@@ -106,16 +128,15 @@ const Index = () => {
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Analyzing...
+                    {t("selection.analyzing")}
                   </span>
                 ) : (
-                  "Generate Plan"
+                  t("selection.generatePlan")
                 )}
               </button>
             </div>
           </div>
         ) : (
-          /* ─── ANALYSIS VIEW ─── */
           <div className="space-y-4">
             <MatchupHeader meta={plan.meta} onReset={handleReset} />
 
