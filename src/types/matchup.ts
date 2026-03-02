@@ -12,8 +12,9 @@ export interface Champion {
   role: string;
 }
 
-/** The full strategic plan JSON from the API */
-export interface MatchupPlan {
+/** Lane strategic plan (top, mid, adc, support) */
+export interface LaneMatchupPlan {
+  type: "lane";
   meta: MatchupMeta;
   overview: MatchupOverview;
   earlyGame: GamePhase;
@@ -23,6 +24,48 @@ export interface MatchupPlan {
   lateGame: GamePhase;
   itemization: Itemization;
   mistakes: MistakeItem[];
+}
+
+/** Jungle-specific strategic plan */
+export interface JungleMatchupPlan {
+  type: "jungle";
+  meta: MatchupMeta;
+  overview: MatchupOverview;
+  clearPath: JungleClearPath;
+  gankingStrategy: GankingStrategy;
+  objectiveControl: ObjectiveControl;
+  counterJungling: CounterJungling;
+  powerSpikes: PowerSpike[];
+  midGame: GamePhase;
+  lateGame: GamePhase;
+  itemization: Itemization;
+  mistakes: MistakeItem[];
+}
+
+export type MatchupPlan = LaneMatchupPlan | JungleMatchupPlan;
+
+export interface JungleClearPath {
+  recommendedStart: string;
+  fullClearRoute: string[];
+  firstBackTiming: string;
+}
+
+export interface GankingStrategy {
+  priority: string;
+  bestTimings: string[];
+  bullets: string[];
+}
+
+export interface ObjectiveControl {
+  dragonPriority: string;
+  heraldStrategy: string;
+  bullets: string[];
+}
+
+export interface CounterJungling {
+  riskLevel: "low" | "medium" | "high";
+  strategy: string;
+  bullets: string[];
 }
 
 export interface MatchupMeta {
