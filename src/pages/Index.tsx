@@ -3,6 +3,7 @@ import { Swords, Loader2, Eye, Map, TrendingUp, Clock, Moon, Package, XOctagon }
 import type { Role, Champion } from "@/types/matchup";
 import { MOCK_PLAN } from "@/data/mock-matchup";
 
+import HeroBanner from "@/components/matchup/HeroBanner";
 import RoleSelector from "@/components/matchup/RoleSelector";
 import ChampionPicker from "@/components/matchup/ChampionPicker";
 import MatchupHeader from "@/components/matchup/MatchupHeader";
@@ -60,12 +61,15 @@ const Index = () => {
         {!plan ? (
           /* ─── SELECTION VIEW ─── */
           <div className="space-y-5">
-            <div className="text-center space-y-2">
-              <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
-                Matchup Analysis
+            {/* Hero Banner */}
+            <HeroBanner />
+
+            <div className="text-center space-y-1">
+              <h1 className="text-lg font-extrabold text-foreground tracking-tight">
+                Análise de Matchup
               </h1>
-              <p className="text-sm text-muted-foreground">
-                Select your role and champions to generate a strategic plan
+              <p className="text-xs text-muted-foreground">
+                Selecione sua role e campeões para gerar um plano estratégico
               </p>
             </div>
 
