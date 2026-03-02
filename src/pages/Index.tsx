@@ -1,35 +1,31 @@
 import { useState } from "react";
-import { Swords, Loader2, Eye, Map, TrendingUp, Clock, Moon, Package, XOctagon } from "lucide-react";
-import type { Role, Champion } from "@/types/matchup";
+import { Swords, Loader2 } from "lucide-react";
+import type { Role, Champion, MatchupPlan } from "@/types/matchup";
 import { MOCK_PLAN } from "@/data/mock-matchup";
+import { MOCK_JUNGLE_PLAN } from "@/data/mock-jungle-matchup";
 
 import HeroBanner from "@/components/matchup/HeroBanner";
 import RoleSelector from "@/components/matchup/RoleSelector";
 import ChampionPicker from "@/components/matchup/ChampionPicker";
 import MatchupHeader from "@/components/matchup/MatchupHeader";
-import QuickOverview from "@/components/matchup/QuickOverview";
-import CollapsibleSection from "@/components/matchup/CollapsibleSection";
-import PhaseCard from "@/components/matchup/PhaseCard";
-import JungleControlCard from "@/components/matchup/JungleControlCard";
-import PowerSpikesList from "@/components/matchup/PowerSpikesList";
-import ItemBuild from "@/components/matchup/ItemBuild";
-import MistakesList from "@/components/matchup/MistakesList";
+import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
+import JungleAnalysisView from "@/components/matchup/JungleAnalysisView";
 
 const Index = () => {
   const [role, setRole] = useState<Role | null>(null);
   const [ally, setAlly] = useState<Champion | null>(null);
   const [enemy, setEnemy] = useState<Champion | null>(null);
   const [loading, setLoading] = useState(false);
-  const [plan, setPlan] = useState<typeof MOCK_PLAN | null>(null);
+  const [plan, setPlan] = useState<MatchupPlan | null>(null);
 
   const canAnalyze = role && ally && enemy;
 
   const handleAnalyze = async () => {
     if (!canAnalyze) return;
     setLoading(true);
-    // Simulates API call to Laravel backend
     await new Promise((r) => setTimeout(r, 1200));
-    setPlan(MOCK_PLAN);
+    setPlan(role === "jungle" ? MOCK_JUNGLE_PLAN : MOCK_PLAN);
+    setLoading(false);
     setLoading(false);
   };
 
@@ -121,71 +117,13 @@ const Index = () => {
         ) : (
           /* ─── ANALYSIS VIEW ─── */
           <div className="space-y-4">
-            {/* Header with champ vs champ */}
             <MatchupHeader meta={plan.meta} onReset={handleReset} />
 
-            {/* DOMINANT SECTION: Quick Overview - always visible */}
-            <QuickOverview overview={plan.overview} />
-
-            {/* Collapsible sections for deep reading */}
-            <CollapsibleSection
-              title={plan.earlyGame.title}
-              icon={<Eye className="w-4 h-4" />}
-              iconColorClass="text-brand"
-              defaultOpen={true}
-            >
-              <PhaseCard phase={plan.earlyGame} />
-            </CollapsibleSection>
-
-            <CollapsibleSection
-              title="Vision & Jungle Control"
-              icon={<Map className="w-4 h-4" />}
-              iconColorClass="text-info-status"
-            >
-              <JungleControlCard data={plan.jungleControl} />
-            </CollapsibleSection>
-
-            <CollapsibleSection
-              title="Power Spikes"
-              icon={<TrendingUp className="w-4 h-4" />}
-              iconColorClass="text-caution"
-              defaultOpen={true}
-            >
-              <PowerSpikesList spikes={plan.powerSpikes} />
-            </CollapsibleSection>
-
-            <CollapsibleSection
-              title={plan.midGame.title}
-              icon={<Clock className="w-4 h-4" />}
-              iconColorClass="text-brand"
-            >
-              <PhaseCard phase={plan.midGame} />
-            </CollapsibleSection>
-
-            <CollapsibleSection
-              title={plan.lateGame.title}
-              icon={<Moon className="w-4 h-4" />}
-              iconColorClass="text-info-status"
-            >
-              <PhaseCard phase={plan.lateGame} />
-            </CollapsibleSection>
-
-            <CollapsibleSection
-              title="Itemization & Runes"
-              icon={<Package className="w-4 h-4" />}
-              iconColorClass="text-brand"
-            >
-              <ItemBuild itemization={plan.itemization} />
-            </CollapsibleSection>
-
-            <CollapsibleSection
-              title="Mistakes to Avoid"
-              icon={<XOctagon className="w-4 h-4" />}
-              iconColorClass="text-threat"
-              defaultOpen={true}
-            >
-              <MistakesList mistakes={plan.mistakes} />
-            </CollapsibleSection>
+            {plan.type === "jungle" ? (
+              <JungleAnalysisView plan={plan} />
+            ) : (
+              <LaneAnalysisView plan={plan} />
+            )}
           </div>
         )}
       </main>

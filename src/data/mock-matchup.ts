@@ -1,4 +1,4 @@
-import { MatchupPlan, Champion } from "@/types/matchup";
+import { LaneMatchupPlan, Champion } from "@/types/matchup";
 
 export const CHAMPIONS: Champion[] = [
   { id: "aatrox", name: "Aatrox", role: "Fighter", image: "https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Aatrox.png" },
@@ -19,7 +19,8 @@ export const CHAMPIONS: Champion[] = [
   { id: "katarina", name: "Katarina", role: "Assassin", image: "https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Katarina.png" },
 ];
 
-export const MOCK_PLAN: MatchupPlan = {
+export const MOCK_PLAN: LaneMatchupPlan = {
+  type: "lane",
   meta: {
     allyChampion: "Garen",
     allyImage: "https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Garen.png",
