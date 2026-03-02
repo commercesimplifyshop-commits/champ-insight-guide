@@ -1,158 +1,189 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Swords, Loader2 } from "lucide-react";
-import ChampionSelector from "@/components/ChampionSelector";
-import AnalysisDashboard from "@/components/AnalysisDashboard";
-import { Champion, MOCK_ANALYSIS } from "@/data/champions";
+import { Swords, Loader2, Eye, Map, TrendingUp, Clock, Moon, Package, XOctagon } from "lucide-react";
+import type { Role, Champion } from "@/types/matchup";
+import { MOCK_PLAN } from "@/data/mock-matchup";
+
+import RoleSelector from "@/components/matchup/RoleSelector";
+import ChampionPicker from "@/components/matchup/ChampionPicker";
+import MatchupHeader from "@/components/matchup/MatchupHeader";
+import QuickOverview from "@/components/matchup/QuickOverview";
+import CollapsibleSection from "@/components/matchup/CollapsibleSection";
+import PhaseCard from "@/components/matchup/PhaseCard";
+import JungleControlCard from "@/components/matchup/JungleControlCard";
+import PowerSpikesList from "@/components/matchup/PowerSpikesList";
+import ItemBuild from "@/components/matchup/ItemBuild";
+import MistakesList from "@/components/matchup/MistakesList";
 
 const Index = () => {
+  const [role, setRole] = useState<Role | null>(null);
   const [ally, setAlly] = useState<Champion | null>(null);
   const [enemy, setEnemy] = useState<Champion | null>(null);
-  const [analysis, setAnalysis] = useState<typeof MOCK_ANALYSIS | null>(null);
   const [loading, setLoading] = useState(false);
+  const [plan, setPlan] = useState<typeof MOCK_PLAN | null>(null);
+
+  const canAnalyze = role && ally && enemy;
 
   const handleAnalyze = async () => {
-    if (!ally || !enemy) return;
+    if (!canAnalyze) return;
     setLoading(true);
-    // Simulate API call + AI analysis
-    await new Promise((r) => setTimeout(r, 1500));
-    setAnalysis(MOCK_ANALYSIS);
+    // Simulates API call to Laravel backend
+    await new Promise((r) => setTimeout(r, 1200));
+    setPlan(MOCK_PLAN);
     setLoading(false);
   };
 
   const handleReset = () => {
+    setRole(null);
     setAlly(null);
     setEnemy(null);
-    setAnalysis(null);
+    setPlan(null);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-surface-1">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      {/* Navbar */}
+      <header className="surface-1 border-b border-border sticky top-0 z-40">
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Swords className="w-6 h-6 text-gold" />
-            <h1 className="font-display text-2xl text-gold tracking-wider">
-              LOL MATCHUP GUIDE
-            </h1>
+            <Swords className="w-5 h-5 text-brand" />
+            <span className="font-bold text-sm tracking-wider text-foreground">
+              MATCHUP<span className="text-brand">.GG</span>
+            </span>
           </div>
-          {analysis && (
-            <button
-              onClick={handleReset}
-              className="text-xs font-body font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-            >
-              Nova Análise
-            </button>
-          )}
+          <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider">
+            Strategic Coach
+          </span>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
-        <AnimatePresence mode="wait">
-          {!analysis ? (
-            <motion.div
-              key="selector"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="space-y-6"
-            >
-              {/* Champion Selection */}
-              <div className="text-center mb-8">
-                <h2 className="font-display text-4xl text-foreground mb-2">SELECIONE OS CAMPEÕES</h2>
-                <p className="text-sm text-muted-foreground font-body">
-                  Escolha seu campeão e o campeão inimigo para receber uma análise completa do matchup
-                </p>
-              </div>
+      <main className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+        {!plan ? (
+          /* ─── SELECTION VIEW ─── */
+          <div className="space-y-5">
+            <div className="text-center space-y-2">
+              <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
+                Matchup Analysis
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Select your role and champions to generate a strategic plan
+              </p>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <ChampionSelector
-                  label="Seu Campeão"
-                  side="ally"
-                  selected={ally}
-                  onSelect={setAlly}
-                  onClear={() => setAlly(null)}
-                />
-                <ChampionSelector
-                  label="Campeão Inimigo"
-                  side="enemy"
-                  selected={enemy}
-                  onSelect={setEnemy}
-                  onClear={() => setEnemy(null)}
-                />
-              </div>
+            {/* Role Selector */}
+            <div className="flex justify-center">
+              <RoleSelector selected={role} onSelect={setRole} />
+            </div>
 
-              {/* Analyze Button */}
-              <div className="flex justify-center pt-4">
-                <motion.button
-                  whileHover={ally && enemy ? { scale: 1.03 } : {}}
-                  whileTap={ally && enemy ? { scale: 0.97 } : {}}
-                  onClick={handleAnalyze}
-                  disabled={!ally || !enemy || loading}
-                  className={`font-display text-xl tracking-wider px-10 py-3 rounded-lg transition-all ${
-                    ally && enemy
-                      ? "gradient-gold text-primary-foreground shadow-gold cursor-pointer"
-                      : "bg-secondary text-muted-foreground cursor-not-allowed"
-                  }`}
-                >
-                  {loading ? (
-                    <span className="flex items-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      ANALISANDO...
-                    </span>
-                  ) : (
-                    "ANALISAR MATCHUP"
-                  )}
-                </motion.button>
-              </div>
-
-              {/* VS Preview */}
-              {ally && enemy && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center justify-center gap-6 pt-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <img src={ally.image} alt={ally.name} className="w-14 h-14 rounded-lg border-2 border-info" />
-                    <span className="font-display text-xl text-foreground">{ally.name}</span>
-                  </div>
-                  <span className="font-display text-3xl text-gold">VS</span>
-                  <div className="flex items-center gap-3">
-                    <span className="font-display text-xl text-foreground">{enemy.name}</span>
-                    <img src={enemy.image} alt={enemy.name} className="w-14 h-14 rounded-lg border-2 border-danger" />
-                  </div>
-                </motion.div>
-              )}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="analysis"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              {/* Matchup Header */}
-              <div className="flex items-center justify-center gap-4 mb-6 py-2">
-                <div className="flex items-center gap-2">
-                  <img src={ally!.image} alt={ally!.name} className="w-12 h-12 rounded-lg border-2 border-info" />
-                  <span className="font-display text-2xl text-foreground">{ally!.name}</span>
-                </div>
-                <span className="font-display text-2xl text-gold">VS</span>
-                <div className="flex items-center gap-2">
-                  <span className="font-display text-2xl text-foreground">{enemy!.name}</span>
-                  <img src={enemy!.image} alt={enemy!.name} className="w-12 h-12 rounded-lg border-2 border-danger" />
-                </div>
-              </div>
-
-              <AnalysisDashboard
-                analysis={analysis}
-                allyName={ally!.name}
-                enemyName={enemy!.name}
+            {/* Champion Pickers */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ChampionPicker
+                label="Your Champion"
+                side="ally"
+                selected={ally}
+                onSelect={setAlly}
+                onClear={() => setAlly(null)}
               />
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <ChampionPicker
+                label="Enemy Champion"
+                side="enemy"
+                selected={enemy}
+                onSelect={setEnemy}
+                onClear={() => setEnemy(null)}
+              />
+            </div>
+
+            {/* Analyze button */}
+            <div className="flex justify-center pt-2">
+              <button
+                onClick={handleAnalyze}
+                disabled={!canAnalyze || loading}
+                className={`px-8 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${
+                  canAnalyze
+                    ? "bg-brand text-primary-foreground hover:brightness-110 shadow-brand"
+                    : "surface-2 text-muted-foreground cursor-not-allowed"
+                }`}
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Analyzing...
+                  </span>
+                ) : (
+                  "Generate Plan"
+                )}
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* ─── ANALYSIS VIEW ─── */
+          <div className="space-y-4">
+            {/* Header with champ vs champ */}
+            <MatchupHeader meta={plan.meta} onReset={handleReset} />
+
+            {/* DOMINANT SECTION: Quick Overview - always visible */}
+            <QuickOverview overview={plan.overview} />
+
+            {/* Collapsible sections for deep reading */}
+            <CollapsibleSection
+              title={plan.earlyGame.title}
+              icon={<Eye className="w-4 h-4" />}
+              iconColorClass="text-brand"
+              defaultOpen={true}
+            >
+              <PhaseCard phase={plan.earlyGame} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Vision & Jungle Control"
+              icon={<Map className="w-4 h-4" />}
+              iconColorClass="text-info-status"
+            >
+              <JungleControlCard data={plan.jungleControl} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Power Spikes"
+              icon={<TrendingUp className="w-4 h-4" />}
+              iconColorClass="text-caution"
+              defaultOpen={true}
+            >
+              <PowerSpikesList spikes={plan.powerSpikes} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title={plan.midGame.title}
+              icon={<Clock className="w-4 h-4" />}
+              iconColorClass="text-brand"
+            >
+              <PhaseCard phase={plan.midGame} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title={plan.lateGame.title}
+              icon={<Moon className="w-4 h-4" />}
+              iconColorClass="text-info-status"
+            >
+              <PhaseCard phase={plan.lateGame} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Itemization & Runes"
+              icon={<Package className="w-4 h-4" />}
+              iconColorClass="text-brand"
+            >
+              <ItemBuild itemization={plan.itemization} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              title="Mistakes to Avoid"
+              icon={<XOctagon className="w-4 h-4" />}
+              iconColorClass="text-threat"
+              defaultOpen={true}
+            >
+              <MistakesList mistakes={plan.mistakes} />
+            </CollapsibleSection>
+          </div>
+        )}
       </main>
     </div>
   );
