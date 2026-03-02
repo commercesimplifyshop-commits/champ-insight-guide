@@ -1,11 +1,16 @@
 import type { Role } from "@/types/matchup";
+import topIcon from "@/assets/roles/top.png";
+import jungleIcon from "@/assets/roles/jungle.png";
+import midIcon from "@/assets/roles/mid.png";
+import adcIcon from "@/assets/roles/adc.png";
+import supportIcon from "@/assets/roles/support.png";
 
 const roles: { value: Role; label: string; icon: string }[] = [
-  { value: "top", label: "Top", icon: "⚔️" },
-  { value: "jungle", label: "Jungle", icon: "🌿" },
-  { value: "mid", label: "Mid", icon: "🔮" },
-  { value: "adc", label: "ADC", icon: "🏹" },
-  { value: "support", label: "Support", icon: "🛡️" },
+  { value: "top", label: "Top", icon: topIcon },
+  { value: "jungle", label: "Jungle", icon: jungleIcon },
+  { value: "mid", label: "Mid", icon: midIcon },
+  { value: "adc", label: "ADC", icon: adcIcon },
+  { value: "support", label: "Support", icon: supportIcon },
 ];
 
 interface RoleSelectorProps {
@@ -26,7 +31,13 @@ const RoleSelector = ({ selected, onSelect }: RoleSelectorProps) => {
               : "surface-2 text-muted-foreground hover:text-foreground hover:bg-secondary"
           }`}
         >
-          <span>{r.icon}</span>
+          <img
+            src={r.icon}
+            alt={r.label}
+            className={`w-4 h-4 object-contain ${
+              selected === r.value ? "brightness-0 invert" : "brightness-0 invert opacity-60"
+            }`}
+          />
           <span className="hidden sm:inline">{r.label}</span>
         </button>
       ))}
