@@ -39,8 +39,8 @@
     /* Semantic status colors */
     --status-advantage: 152 60% 48%;
     --status-advantage-bg: 152 40% 10%;
-    --status-danger: 0 72% 55%;
-    --status-danger-bg: 0 50% 10%;
+    --status-danger: 355 80% 62%;
+    --status-danger-bg: 355 55% 12%;
     --status-warning: 38 92% 55%;
     --status-warning-bg: 38 50% 10%;
     --status-info: 215 75% 58%;
@@ -110,6 +110,7 @@
 
   .text-threat { color: hsl(var(--status-danger)); }
   .bg-threat { background-color: hsl(var(--status-danger-bg)); }
+  .bg-threat-bar { background-color: hsl(355 55% 20%); }
   .border-threat { border-color: hsl(var(--status-danger)); }
 
   .text-caution { color: hsl(var(--status-warning)); }

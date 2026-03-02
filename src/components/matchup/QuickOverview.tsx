@@ -1,12 +1,12 @@
 import { MatchupOverview as OverviewType, AdvantageLevel } from "@/types/matchup";
 import { Zap, Target, AlertTriangle, Crosshair } from "lucide-react";
 
-const advantageConfig: Record<AdvantageLevel, { label: string; borderClass: string; bgClass: string; textClass: string }> = {
-  strong: { label: "STRONG ADVANTAGE", borderClass: "border-advantage", bgClass: "bg-advantage", textClass: "text-advantage" },
-  slight: { label: "SLIGHT ADVANTAGE", borderClass: "border-advantage", bgClass: "bg-advantage", textClass: "text-advantage" },
-  even: { label: "EVEN MATCHUP", borderClass: "border-caution", bgClass: "bg-caution", textClass: "text-caution" },
-  slight_disadvantage: { label: "SLIGHT DISADVANTAGE", borderClass: "border-caution", bgClass: "bg-caution", textClass: "text-caution" },
-  hard: { label: "HARD DISADVANTAGE", borderClass: "border-threat", bgClass: "bg-threat", textClass: "text-threat" },
+const advantageConfig: Record<AdvantageLevel, { label: string; borderClass: string; statusBg: string; statusText: string; textClass: string }> = {
+  strong: { label: "STRONG ADVANTAGE", borderClass: "border-advantage", statusBg: "bg-advantage", statusText: "text-foreground", textClass: "text-advantage" },
+  slight: { label: "SLIGHT ADVANTAGE", borderClass: "border-advantage", statusBg: "bg-advantage", statusText: "text-foreground", textClass: "text-advantage" },
+  even: { label: "EVEN MATCHUP", borderClass: "border-caution", statusBg: "bg-caution", statusText: "text-foreground", textClass: "text-caution" },
+  slight_disadvantage: { label: "SLIGHT DISADVANTAGE", borderClass: "border-caution", statusBg: "bg-caution", statusText: "text-foreground", textClass: "text-caution" },
+  hard: { label: "HARD DISADVANTAGE", borderClass: "border-threat", statusBg: "bg-threat-bar", statusText: "text-foreground", textClass: "text-threat" },
 };
 
 interface QuickOverviewProps {
@@ -23,9 +23,9 @@ const QuickOverview = ({ overview }: QuickOverviewProps) => {
   return (
     <div className={`rounded-lg border-2 ${adv.borderClass} overflow-hidden`}>
       {/* Status bar */}
-      <div className={`${adv.bgClass} px-4 py-2 flex items-center gap-2`}>
-        <Zap className="w-4 h-4 text-background" />
-        <span className="text-sm font-bold text-background tracking-wider uppercase">
+      <div className={`${adv.statusBg} px-4 py-2 flex items-center gap-2`}>
+        <Zap className={`w-4 h-4 ${adv.statusText}`} />
+        <span className={`text-sm font-bold tracking-wider uppercase ${adv.statusText}`}>
           {adv.label}
         </span>
       </div>
