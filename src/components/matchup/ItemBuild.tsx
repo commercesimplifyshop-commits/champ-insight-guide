@@ -1,18 +1,20 @@
 import { Itemization } from "@/types/matchup";
 import { Package, Sparkles, BookOpen } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface ItemBuildProps {
   itemization: Itemization;
 }
 
 const ItemBuild = ({ itemization }: ItemBuildProps) => {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-4">
-      {/* Core Build */}
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Package className="w-3.5 h-3.5 text-brand" />
-          <span className="text-xs font-bold text-brand uppercase tracking-wider">Core Build</span>
+          <span className="text-xs font-bold text-brand uppercase tracking-wider">{t("items.coreBuild")}</span>
         </div>
         <div className="space-y-1.5">
           {itemization.coreBuild.map((item, i) => (
@@ -25,11 +27,10 @@ const ItemBuild = ({ itemization }: ItemBuildProps) => {
         </div>
       </div>
 
-      {/* Situational */}
       <div>
         <div className="flex items-center gap-2 mb-2">
           <Sparkles className="w-3.5 h-3.5 text-caution" />
-          <span className="text-xs font-bold text-caution uppercase tracking-wider">Situational</span>
+          <span className="text-xs font-bold text-caution uppercase tracking-wider">{t("items.situational")}</span>
         </div>
         <div className="space-y-1.5">
           {itemization.situational.map((item, i) => (
@@ -41,11 +42,10 @@ const ItemBuild = ({ itemization }: ItemBuildProps) => {
         </div>
       </div>
 
-      {/* Rune Note */}
       <div className="surface-2 rounded-md px-3 py-2.5 flex items-start gap-2">
         <BookOpen className="w-3.5 h-3.5 text-info-status shrink-0 mt-0.5" />
         <div>
-          <span className="text-xs font-bold text-info-status uppercase tracking-wider">Runes: </span>
+          <span className="text-xs font-bold text-info-status uppercase tracking-wider">{t("items.runes")}: </span>
           <span className="text-xs text-foreground/70">{itemization.runeNote}</span>
         </div>
       </div>

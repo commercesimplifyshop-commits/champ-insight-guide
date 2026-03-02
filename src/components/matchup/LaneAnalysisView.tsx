@@ -1,5 +1,6 @@
 import { Eye, Map, TrendingUp, Clock, Moon, Package, XOctagon } from "lucide-react";
 import type { LaneMatchupPlan } from "@/types/matchup";
+import { useI18n } from "@/lib/i18n";
 import QuickOverview from "./QuickOverview";
 import CollapsibleSection from "./CollapsibleSection";
 import PhaseCard from "./PhaseCard";
@@ -13,6 +14,8 @@ interface LaneAnalysisViewProps {
 }
 
 const LaneAnalysisView = ({ plan }: LaneAnalysisViewProps) => {
+  const { t } = useI18n();
+
   return (
     <>
       <QuickOverview overview={plan.overview} />
@@ -27,7 +30,7 @@ const LaneAnalysisView = ({ plan }: LaneAnalysisViewProps) => {
       </CollapsibleSection>
 
       <CollapsibleSection
-        title="Vision & Jungle Control"
+        title={t("lane.visionJungle")}
         icon={<Map className="w-4 h-4" />}
         iconColorClass="text-info-status"
       >
@@ -35,7 +38,7 @@ const LaneAnalysisView = ({ plan }: LaneAnalysisViewProps) => {
       </CollapsibleSection>
 
       <CollapsibleSection
-        title="Power Spikes"
+        title={t("lane.powerSpikes")}
         icon={<TrendingUp className="w-4 h-4" />}
         iconColorClass="text-caution"
         defaultOpen={true}
@@ -60,7 +63,7 @@ const LaneAnalysisView = ({ plan }: LaneAnalysisViewProps) => {
       </CollapsibleSection>
 
       <CollapsibleSection
-        title="Itemization & Runes"
+        title={t("lane.itemization")}
         icon={<Package className="w-4 h-4" />}
         iconColorClass="text-brand"
       >
@@ -68,7 +71,7 @@ const LaneAnalysisView = ({ plan }: LaneAnalysisViewProps) => {
       </CollapsibleSection>
 
       <CollapsibleSection
-        title="Mistakes to Avoid"
+        title={t("lane.mistakes")}
         icon={<XOctagon className="w-4 h-4" />}
         iconColorClass="text-threat"
         defaultOpen={true}
