@@ -1,0 +1,34 @@
+import { MistakeItem } from "@/types/matchup";
+import { XCircle, AlertTriangle, Info } from "lucide-react";
+
+const severityConfig = {
+  critical: { icon: XCircle, bgClass: "bg-threat", textClass: "text-threat", label: "CRITICAL" },
+  warning: { icon: AlertTriangle, bgClass: "bg-caution", textClass: "text-caution", label: "WARNING" },
+  minor: { icon: Info, bgClass: "bg-info-status", textClass: "text-info-status", label: "MINOR" },
+};
+
+interface MistakesListProps {
+  mistakes: MistakeItem[];
+}
+
+const MistakesList = ({ mistakes }: MistakesListProps) => {
+  return (
+    <div className="space-y-2">
+      {mistakes.map((mistake, i) => {
+        const config = severityConfig[mistake.severity];
+        const Icon = config.icon;
+        return (
+          <div key={i} className="flex items-start gap-3 surface-2 rounded-md px-3 py-2.5">
+            <Icon className={`w-4 h-4 shrink-0 mt-0.5 ${config.textClass}`} />
+            <span className="text-sm text-foreground/80 flex-1">{mistake.text}</span>
+            <span className={`text-[10px] font-bold uppercase tracking-wider shrink-0 ${config.textClass}`}>
+              {config.label}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default MistakesList;
