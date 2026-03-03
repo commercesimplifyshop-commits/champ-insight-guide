@@ -41,11 +41,12 @@ const Index = () => {
   const handleAnalyze = async () => {
     if (!canAnalyze) return;
     setLoading(true);
+    let rawText = '';
     try {
       // Always call the un-prefixed backend proxy to avoid HTTP->HTTPS redirects
       // which may convert POST to GET. The backend exposes /api/openai and
       // also /api/{locale}/openai, but using the un-prefixed route avoids redirect issues.
-      const openaiEndpoint = `/api/openai`;
+      const openaiEndpoint = `/api/analyze`;
 
       // Send minimal payload: only language and matchup (role + champion ids)
       const prompt = {
@@ -63,130 +64,148 @@ const Index = () => {
         body: JSON.stringify({ prompt })
       });
 
-      if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(`OpenAI proxy error: ${res.status} ${txt}`);
+      // Read raw text first to handle cases where the backend returns
+      // plain text, an OpenAI-style completion object, or a JSON body.
+      rawText = await res.text();
+      let body: any = null;
+      try {
+        body = JSON.parse(rawText);
+      } catch (e) {
+        // not valid JSON — treat the whole response as plain content
+        body = rawText;
       }
 
-      const body = await res.json();
+      // Utility: try to extract JSON from a text string. Handles:
+      // - direct JSON
+      // - JSON inside markdown code fences (```json ... ```)
+      // - first {...} or [...] substring
+      // - unescaped JSON inside text
+      const extractJsonFromText = (text: string) => {
+        if (!text) return null;
+        // Try direct parse
+        try { return JSON.parse(text); } catch (e) { }
 
-      const aiJson = body.json || (() => {
-        try {
-          const content = body.content || (body.raw && body.raw.choices?.[0]?.message?.content) || '';
-          const m = (content || '').match(/(\{[\s\S]*\})/);
-          return m ? JSON.parse(m[1]) : null;
-        } catch (e) {
-          return null;
-        }
-      })();
-
-      // Validate AI JSON against minimal required contract to avoid runtime crashes
-      const validateAiJson = (json: any, roleType: string) => {
-        const errors: string[] = [];
-        if (!json || typeof json !== 'object') {
-          errors.push('Resposta não é um objeto JSON.');
-          return errors;
+        // Try to find triple-backtick blocks (``` or ```json)
+        const fence = text.match(/```(?:json)?\n?([\s\S]*?)```/i);
+        if (fence && fence[1]) {
+          const inside = fence[1].trim();
+          try { return JSON.parse(inside); } catch (e) { }
         }
 
-        const expectedType = roleType === 'jungle' ? 'jungle' : 'lane';
-        if (json.type && json.type !== expectedType) {
-          errors.push(`Campo 'type' inesperado: recebeu '${json.type}', esperado '${expectedType}'.`);
+        // Try to extract a JSON object or array substring
+        const objMatch = text.match(/(\{[\s\S]*\})/);
+        if (objMatch) {
+          try { return JSON.parse(objMatch[1]); } catch (e) {
+            // maybe the JSON contains escaped newlines - try to unescape
+            const unescaped = objMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+            try { return JSON.parse(unescaped); } catch (e) { }
+          }
         }
 
-        const earlyLevel = json.overview?.earlyAdvantage?.level;
-        const allowedEarly = ['strong', 'slight', 'even', 'slight_disadvantage', 'hard'];
-        if (!earlyLevel || !allowedEarly.includes(earlyLevel)) {
-          errors.push("overview.earlyAdvantage.level inválido ou faltando. Deve ser um de: " + allowedEarly.join(', '));
+        const arrMatch = text.match(/(\[[\s\S]*\])/);
+        if (arrMatch) {
+          try { return JSON.parse(arrMatch[1]); } catch (e) { }
         }
 
-        const powerSpikes = Array.isArray(json.powerSpikes) ? json.powerSpikes : [];
-        if (powerSpikes.length < 4 || powerSpikes.length > 6) {
-          errors.push('powerSpikes deve ter entre 4 e 6 itens.');
-        } else {
-          const allowedAdv = ['ally', 'enemy', 'even'];
-          powerSpikes.forEach((ps: any, i: number) => {
-            if (!allowedAdv.includes(ps?.advantage)) errors.push(`powerSpikes[${i}].advantage inválido: ${ps?.advantage}`);
-          });
-        }
-
-        const mistakes = Array.isArray(json.mistakes) ? json.mistakes : [];
-        if (mistakes.length < 4 || mistakes.length > 6) {
-          errors.push('mistakes deve ter entre 4 e 6 itens.');
-        } else {
-          const allowedSev = ['critical', 'warning', 'minor'];
-          mistakes.forEach((m: any, i: number) => {
-            if (!allowedSev.includes(m?.severity)) errors.push(`mistakes[${i}].severity inválido: ${m?.severity}`);
-          });
-        }
-
-        if (expectedType === 'jungle') {
-          const required = ['clearPath', 'gankingStrategy', 'objectiveControl', 'counterJungling'];
-          required.forEach((k) => { if (!json[k]) errors.push(`Campo obrigatório para jungle faltando: ${k}`); });
-          const counterRisk = json.counterJungling?.riskLevel;
-          if (counterRisk && !['low', 'medium', 'high'].includes(counterRisk)) errors.push('counterJungling.riskLevel deve ser low | medium | high');
-        } else {
-          const required = ['earlyGame', 'jungleControl'];
-          required.forEach((k) => { if (!json[k]) errors.push(`Campo obrigatório para lane faltando: ${k}`); });
-        }
-
-        return errors;
+        return null;
       };
 
-      if (!aiJson) throw new Error('Resposta da IA não contém JSON válido. Conteúdo bruto: ' + JSON.stringify(body));
+      // Try multiple strategies to locate the embedded plan JSON.
+      let aiJson: any = null;
 
-      // run validation and fail early with descriptive message so UI doesn't render broken data
-      const validationErrors = validateAiJson(aiJson, role === 'jungle' ? 'jungle' : 'lane');
-      if (validationErrors.length) {
-        console.error('AI response failed validation', { validationErrors, body, aiJson });
-        throw new Error('Resposta da IA não segue o contrato esperado: ' + validationErrors.join('; '));
+      if (Array.isArray(body)) {
+        // Backend returned a top-level array — try to find a plan-like object
+        for (const el of body) {
+          if (el && typeof el === 'object') {
+            if (el.json && typeof el.json === 'object') {
+              aiJson = el.json;
+              break;
+            }
+            if (el.type && (el.type === 'jungle' || el.type === 'lane' || typeof el.type === 'string')) {
+              aiJson = el;
+              break;
+            }
+          }
+        }
+        // If still not found, try extracting JSON from the stringified array
+        if (!aiJson) aiJson = extractJsonFromText(JSON.stringify(body));
+      } else if (body && typeof body === 'object' && !Array.isArray(body)) {
+        if (body.json && typeof body.json === 'object') {
+          aiJson = body.json;
+        } else if (body.type && (body.type === 'jungle' || body.type === 'lane' || typeof body.type === 'string')) {
+          // Backend returned the plan directly
+          aiJson = body;
+        } else {
+          const contentCandidates = [
+            body.content,
+            body.raw && body.raw.choices?.[0]?.message?.content,
+            body.choices?.[0]?.message?.content,
+            body.choices?.[0]?.text,
+            JSON.stringify(body),
+          ];
+
+          for (const c of contentCandidates) {
+            const found = extractJsonFromText(c || '');
+            if (found) { aiJson = found; break; }
+          }
+        }
+      } else if (typeof body === 'string') {
+        aiJson = extractJsonFromText(body);
       }
 
-      // Map AI JSON to front-end MatchupPlan shape
-      const mappedPlan: any = {
-        type: role === 'jungle' ? 'jungle' : 'lane',
-        meta: {
-          allyChampion: ally?.name || ally?.id || '',
-          allyImage: ally?.image || null,
-          enemyChampion: enemy?.name || enemy?.id || '',
-          enemyImage: enemy?.image || null,
-          role: role,
-          difficulty: aiJson.overview && aiJson.overview.earlyAdvantage && aiJson.overview.earlyAdvantage.level ? aiJson.overview.earlyAdvantage.level : undefined,
-          winRate: null,
-          patch: (aiJson.metadata && aiJson.metadata.patch) || null,
-        },
+      if (!aiJson) {
+        const preview = typeof body === 'string' ? body.slice(0, 200) : JSON.stringify(body, null, 2).slice(0, 200);
+        throw new Error('Resposta da IA não contém JSON válido. Conteúdo bruto: ' + preview);
+      }
+
+      // Map the API JSON to the front-end MatchupPlan shape, but do not enforce
+      // rigid array lengths or enum checks. Use defensive defaults similar to the
+      // manual JSON loader so the UI can render whatever reasonable content the
+      // AI returned.
+      const mappedPlan: any = { ...aiJson };
+
+      mappedPlan.type = mappedPlan.type || (role === 'jungle' ? 'jungle' : 'lane');
+
+      mappedPlan.meta = mappedPlan.meta || {
+        allyChampion: ally?.name || ally?.id || '',
+        allyImage: ally?.image || null,
+        enemyChampion: enemy?.name || enemy?.id || '',
+        enemyImage: enemy?.image || null,
+        role: role,
+        difficulty: mappedPlan.overview?.earlyAdvantage?.level || undefined,
+        winRate: null,
+        patch: (mappedPlan.metadata && mappedPlan.metadata.patch) || null,
       };
 
-      // copy common sections (defensive)
-      if (aiJson.overview) mappedPlan.overview = aiJson.overview;
-      if (aiJson.earlyGame) mappedPlan.earlyGame = aiJson.earlyGame;
-      if (aiJson.clearPath) mappedPlan.earlyGame = mappedPlan.earlyGame || { title: 'Early Game', objective: '', bullets: [] };
-      if (aiJson.jungleControl) mappedPlan.jungleControl = aiJson.jungleControl;
-      if (aiJson.powerSpikes) mappedPlan.powerSpikes = aiJson.powerSpikes;
-      if (aiJson.midGame) mappedPlan.midGame = aiJson.midGame;
-      if (aiJson.lateGame) mappedPlan.lateGame = aiJson.lateGame;
-      if (aiJson.itemization) mappedPlan.itemization = aiJson.itemization;
-      if (aiJson.itemizationPlan) mappedPlan.itemization = mappedPlan.itemization || aiJson.itemizationPlan;
-      if (aiJson.mistakes) mappedPlan.mistakes = aiJson.mistakes;
-      if (aiJson.mistakesThatLoseTheGame) mappedPlan.mistakes = mappedPlan.mistakes || aiJson.mistakesThatLoseTheGame;
-
-      // fallback: if prompt returned top-level keys that differ, try to pick known names
-      // ensure required keys exist for the UI components
+      // Ensure common sections exist so UI components won't crash; keep arrays as-is
+      // if provided by the API, otherwise provide simple empty defaults.
       mappedPlan.overview = mappedPlan.overview || { earlyAdvantage: { level: 'even', summary: '' }, primaryPlan: '', biggestThreat: '', firstDecisionFocus: '' };
-      mappedPlan.earlyGame = mappedPlan.earlyGame || { title: 'Early Game', objective: '', bullets: [] };
+      mappedPlan.earlyGame = mappedPlan.earlyGame || mappedPlan.clearPath || { title: 'Early Game', objective: '', bullets: [] };
+      if (mappedPlan.clearPath && !mappedPlan.earlyGame) mappedPlan.earlyGame = mappedPlan.clearPath;
+      mappedPlan.jungleControl = mappedPlan.jungleControl || mappedPlan.objectiveControl || null;
       mappedPlan.midGame = mappedPlan.midGame || { title: 'Mid Game', objective: '', bullets: [] };
       mappedPlan.lateGame = mappedPlan.lateGame || { title: 'Late Game', objective: '', bullets: [] };
-      mappedPlan.itemization = mappedPlan.itemization || { coreBuild: [], situational: [], runeNote: '' };
+      mappedPlan.itemization = mappedPlan.itemization || mappedPlan.itemizationPlan || { coreBuild: [], situational: [], runeNote: '' };
       mappedPlan.powerSpikes = Array.isArray(mappedPlan.powerSpikes) ? mappedPlan.powerSpikes : [];
       mappedPlan.mistakes = Array.isArray(mappedPlan.mistakes) ? mappedPlan.mistakes : [];
 
       setPlan(mappedPlan as any);
     } catch (err: any) {
       console.error('Analysis failed', err);
+      // If parsing failed because no JSON found, populate the debug textarea
+      // with the raw response so the user can inspect and load it with
+      // the existing "Carregar JSON" button.
+      const isNoJsonError = typeof err?.message === 'string' && err.message.includes('Resposta da IA não contém JSON válido');
+      if (isNoJsonError && rawText) {
+        try { setDebugJson(rawText); } catch (_) { }
+        console.debug('Raw response loaded into debug textarea:', rawText.slice(0, 1000));
+      }
+
       // show a temporary non-blocking notice below the banner instead of alert()
       const msg = err?.message || 'Erro ao gerar análise com IA';
       setNotice(msg);
       if (noticeTimeoutRef.current) window.clearTimeout(noticeTimeoutRef.current);
-      noticeTimeoutRef.current = window.setTimeout(() => setNotice(null), 6000);
+      noticeTimeoutRef.current = window.setTimeout(() => setNotice(null), 12000);
     } finally {
       setLoading(false);
     }
@@ -322,8 +341,8 @@ const Index = () => {
                   onClick={handleDebugLoad}
                   disabled={!debugJson.trim()}
                   className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${debugJson.trim()
-                      ? "bg-caution text-background hover:brightness-110"
-                      : "surface-2 text-muted-foreground cursor-not-allowed"
+                    ? "bg-caution text-background hover:brightness-110"
+                    : "surface-2 text-muted-foreground cursor-not-allowed"
                     }`}
                 >
                   Carregar JSON
