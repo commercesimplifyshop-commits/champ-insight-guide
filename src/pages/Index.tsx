@@ -11,6 +11,8 @@ import ChampionPicker from "@/components/matchup/ChampionPicker";
 import MatchupHeader from "@/components/matchup/MatchupHeader";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
 import JungleAnalysisView from "@/components/matchup/JungleAnalysisView";
+import QrCodeSupport from "@/components/monetization/QrCodeSupport";
+import AdBanner from "@/components/monetization/AdBanner";
 
 const langOptions: { value: Locale; flag: string; label: string }[] = [
   { value: "pt", flag: "🇧🇷", label: "PT" },
@@ -264,7 +266,14 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
+        {/* Left sidebar — Ad */}
+        <aside className="hidden lg:flex flex-col gap-4 w-[180px] shrink-0 sticky top-20 self-start">
+          <AdBanner slot="left" />
+        </aside>
+
+        {/* Main content */}
+        <main className="flex-1 min-w-0 max-w-3xl mx-auto space-y-4">
         {!plan ? (
           <div className="space-y-5">
             <HeroBanner />
@@ -278,7 +287,7 @@ const Index = () => {
               </p>
               {notice && (
                 <div className="max-w-3xl mx-auto px-4 mt-3">
-                  <div role="status" className="rounded-md border border-yellow-200 bg-yellow-50 text-yellow-900 px-4 py-2 text-sm shadow-sm">
+                  <div role="status" className="rounded-md border border-caution bg-caution/10 text-caution px-4 py-2 text-sm shadow-sm">
                     {notice}
                   </div>
                 </div>
@@ -359,9 +368,19 @@ const Index = () => {
             ) : (
               <LaneAnalysisView plan={plan} />
             )}
+
+            {/* Bottom ad — below analysis */}
+            <AdBanner slot="bottom" />
           </div>
         )}
       </main>
+
+        {/* Right sidebar — QR Code + Ad */}
+        <aside className="hidden lg:flex flex-col gap-4 w-[200px] shrink-0 sticky top-20 self-start">
+          <QrCodeSupport />
+          <AdBanner slot="right" />
+        </aside>
+      </div>
     </div>
   );
 };
