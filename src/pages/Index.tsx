@@ -33,6 +33,9 @@ const Index = () => {
     };
   }, []);
 
+  const [debugJson, setDebugJson] = useState("");
+  const isDebug = import.meta.env.VITE_APP_DEBUG === "true";
+
   const canAnalyze = role && ally && enemy;
 
   const handleAnalyze = async () => {
@@ -189,6 +192,15 @@ const Index = () => {
     }
   };
 
+  const handleDebugLoad = () => {
+    try {
+      const parsed = JSON.parse(debugJson) as MatchupPlan;
+      setPlan(parsed);
+    } catch {
+      alert("JSON inválido");
+    }
+  };
+
   const handleReset = () => {
     setRole(null);
     setAlly(null);
@@ -294,6 +306,30 @@ const Index = () => {
                 )}
               </button>
             </div>
+
+            {isDebug && (
+              <div className="space-y-2 border border-dashed border-muted-foreground/30 rounded-lg p-4">
+                <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                  Debug: Cole o JSON da API
+                </label>
+                <textarea
+                  value={debugJson}
+                  onChange={(e) => setDebugJson(e.target.value)}
+                  placeholder='{"type": "jungle", ...}'
+                  className="w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                <button
+                  onClick={handleDebugLoad}
+                  disabled={!debugJson.trim()}
+                  className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${debugJson.trim()
+                      ? "bg-caution text-background hover:brightness-110"
+                      : "surface-2 text-muted-foreground cursor-not-allowed"
+                    }`}
+                >
+                  Carregar JSON
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
