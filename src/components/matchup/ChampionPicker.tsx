@@ -1,6 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, X } from "lucide-react";
-import { CHAMPIONS } from "@/data/mock-matchup";
 import type { Champion } from "@/types/matchup";
 import { useI18n } from "@/lib/i18n";
 
@@ -15,12 +14,42 @@ interface ChampionPickerProps {
 const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPickerProps) => {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState<Champion[]>([]);
+  const [loading, setLoading] = useState(false);
+  const debounceRef = useRef<number | null>(null);
   const { t } = useI18n();
+  // some i18n implementations use strict key types; cast to any for optional keys used here
+  const loadingLabel = (t as any)('common.loading') || 'Loading...';
 
-  const filtered = useMemo(() => {
-    if (!query) return CHAMPIONS;
-    return CHAMPIONS.filter((c) => c.name.toLowerCase().includes(query.toLowerCase()));
-  }, [query]);
+  useEffect(() => {
+    // cleanup on unmount
+    return () => { if (debounceRef.current) window.clearTimeout(debounceRef.current); };
+  }, []);
+
+  const fetchSuggestions = async (term: string) => {
+    if (!term || term.length < 1) {
+      setSuggestions([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const localePrefix = (typeof window !== 'undefined' && (window as any).__LOCALE__) ? `/api/${(window as any).__LOCALE__}` : '/api';
+      const res = await fetch(`${localePrefix}/champions?q=${encodeURIComponent(term)}`, { headers: { Accept: 'application/json' } });
+      if (!res.ok) {
+        setSuggestions([]);
+      } else {
+        const data = await res.json();
+        if (Array.isArray(data)) setSuggestions(data);
+        else setSuggestions([]);
+      }
+    } catch (err) {
+      console.error('Failed to fetch champion suggestions', err);
+      setSuggestions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const borderClass = side === "ally" ? "border-info-status" : "border-threat";
 
@@ -50,7 +79,15 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
             type="text"
             placeholder={t("selection.searchChampion")}
             value={query}
-            onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+            onChange={(e) => {
+              const v = e.target.value;
+              setQuery(v);
+              setOpen(true);
+              if (debounceRef.current) window.clearTimeout(debounceRef.current);
+              // debounce 250ms
+              // @ts-ignore
+              debounceRef.current = window.setTimeout(() => fetchSuggestions(v), 250);
+            }}
             onFocus={() => setOpen(true)}
             className="bg-transparent text-foreground placeholder:text-muted-foreground outline-none flex-1 text-sm"
           />
@@ -59,14 +96,16 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
 
       {open && (
         <div className="absolute z-50 top-full mt-1 left-0 right-0 surface-2 border border-border rounded-lg shadow-lg max-h-52 overflow-y-auto">
-          {filtered.length === 0 ? (
+          {loading ? (
+            <p className="p-3 text-xs text-muted-foreground text-center">{loadingLabel}</p>
+          ) : suggestions.length === 0 ? (
             <p className="p-3 text-xs text-muted-foreground text-center">{t("selection.noChampions")}</p>
           ) : (
             <div className="grid grid-cols-5 gap-0.5 p-1.5">
-              {filtered.map((c) => (
+              {suggestions.map((c) => (
                 <button
                   key={c.id}
-                  onClick={() => { onSelect(c); setOpen(false); setQuery(""); }}
+                  onClick={() => { onSelect(c); setOpen(false); setQuery(""); setSuggestions([]); }}
                   className="flex flex-col items-center gap-0.5 p-1.5 rounded hover:bg-secondary/50 transition-colors"
                 >
                   <img src={c.image} alt={c.name} className="w-8 h-8 rounded" />

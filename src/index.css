@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
 
 @layer base {
   :root {
@@ -94,32 +94,92 @@
   .font-mono {
     font-family: var(--font-mono);
   }
-  .surface-0 { background-color: hsl(var(--surface-0)); }
-  .surface-1 { background-color: hsl(var(--surface-1)); }
-  .surface-2 { background-color: hsl(var(--surface-2)); }
-  .surface-3 { background-color: hsl(var(--surface-3)); }
 
-  .text-brand { color: hsl(var(--brand)); }
-  .bg-brand { background-color: hsl(var(--brand)); }
-  .border-brand { border-color: hsl(var(--brand)); }
-  .bg-brand-muted { background-color: hsl(var(--brand-muted)); }
+  .surface-0 {
+    background-color: hsl(var(--surface-0));
+  }
 
-  .text-advantage { color: hsl(var(--status-advantage)); }
-  .bg-advantage { background-color: hsl(var(--status-advantage-bg)); }
-  .border-advantage { border-color: hsl(var(--status-advantage)); }
+  .surface-1 {
+    background-color: hsl(var(--surface-1));
+  }
 
-  .text-threat { color: hsl(var(--status-danger)); }
-  .bg-threat { background-color: hsl(var(--status-danger-bg)); }
-  .bg-threat-bar { background-color: hsl(355 55% 20%); }
-  .border-threat { border-color: hsl(var(--status-danger)); }
+  .surface-2 {
+    background-color: hsl(var(--surface-2));
+  }
 
-  .text-caution { color: hsl(var(--status-warning)); }
-  .bg-caution { background-color: hsl(var(--status-warning-bg)); }
-  .border-caution { border-color: hsl(var(--status-warning)); }
+  .surface-3 {
+    background-color: hsl(var(--surface-3));
+  }
 
-  .text-info-status { color: hsl(var(--status-info)); }
-  .bg-info-status { background-color: hsl(var(--status-info-bg)); }
-  .border-info-status { border-color: hsl(var(--status-info)); }
+  .text-brand {
+    color: hsl(var(--brand));
+  }
 
-  .shadow-brand { box-shadow: var(--shadow-brand); }
+  .bg-brand {
+    background-color: hsl(var(--brand));
+  }
+
+  .border-brand {
+    border-color: hsl(var(--brand));
+  }
+
+  .bg-brand-muted {
+    background-color: hsl(var(--brand-muted));
+  }
+
+  .text-advantage {
+    color: hsl(var(--status-advantage));
+  }
+
+  .bg-advantage {
+    background-color: hsl(var(--status-advantage-bg));
+  }
+
+  .border-advantage {
+    border-color: hsl(var(--status-advantage));
+  }
+
+  .text-threat {
+    color: hsl(var(--status-danger));
+  }
+
+  .bg-threat {
+    background-color: hsl(var(--status-danger-bg));
+  }
+
+  .bg-threat-bar {
+    background-color: hsl(355 55% 20%);
+  }
+
+  .border-threat {
+    border-color: hsl(var(--status-danger));
+  }
+
+  .text-caution {
+    color: hsl(var(--status-warning));
+  }
+
+  .bg-caution {
+    background-color: hsl(var(--status-warning-bg));
+  }
+
+  .border-caution {
+    border-color: hsl(var(--status-warning));
+  }
+
+  .text-info-status {
+    color: hsl(var(--status-info));
+  }
+
+  .bg-info-status {
+    background-color: hsl(var(--status-info-bg));
+  }
+
+  .border-info-status {
+    border-color: hsl(var(--status-info));
+  }
+
+  .shadow-brand {
+    box-shadow: var(--shadow-brand);
+  }
 }
