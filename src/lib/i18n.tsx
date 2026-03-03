@@ -100,6 +100,14 @@ const translations = {
   "mistakes.critical": { pt: "CRÍTICO", en: "CRITICAL" },
   "mistakes.warning": { pt: "ATENÇÃO", en: "WARNING" },
   "mistakes.minor": { pt: "MENOR", en: "MINOR" },
+
+  // Support / Monetization
+  "support.title": { pt: "Apoie o Projeto", en: "Support Us" },
+  "support.description": {
+    pt: "Ajude a manter o MATCHUP.GG gratuito e sem anúncios invasivos. Qualquer contribuição faz diferença!",
+    en: "Help keep MATCHUP.GG free and without intrusive ads. Every contribution makes a difference!",
+  },
+  "support.scanMessage": { pt: "Escaneie para contribuir via Pix", en: "Scan to contribute" },
 } as const;
 
 type TranslationKey = keyof typeof translations;
