@@ -9,6 +9,8 @@ interface MatchupHeaderProps {
 const MatchupHeader = ({ meta, onReset }: MatchupHeaderProps) => {
   const { t } = useI18n();
 
+  if (!meta) return null;
+
   const difficultyConfig: Record<AdvantageLevel, { labelKey: string; class: string; barWidth: string }> = {
     strong: { labelKey: "difficulty.strong", class: "text-advantage", barWidth: "w-1/5" },
     slight: { labelKey: "difficulty.slight", class: "text-advantage", barWidth: "w-2/5" },
