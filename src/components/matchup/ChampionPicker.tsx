@@ -97,7 +97,9 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
       {open && (
         <div className="absolute z-50 top-full mt-1 left-0 right-0 surface-2 border border-border rounded-lg shadow-lg max-h-52 overflow-y-auto">
           {loading ? (
-            <p className="p-3 text-xs text-muted-foreground text-center">{loadingLabel}</p>
+            <div className="flex items-center justify-center p-4">
+              <div className="w-6 h-6 border-2 border-muted-foreground/30 border-t-primary rounded-full animate-spin" />
+            </div>
           ) : suggestions.length === 0 ? (
             <p className="p-3 text-xs text-muted-foreground text-center">{t("selection.noChampions")}</p>
           ) : (
