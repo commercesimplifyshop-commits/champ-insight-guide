@@ -4,6 +4,7 @@ import type { Role, Champion, MatchupPlan } from "@/types/matchup";
 import { MOCK_PLAN } from "@/data/mock-matchup";
 import { MOCK_JUNGLE_PLAN } from "@/data/mock-jungle-matchup";
 import { useI18n, type Locale } from "@/lib/i18n";
+import { getRecaptchaToken } from "@/lib/recaptcha";
 
 import HeroBanner from "@/components/matchup/HeroBanner";
 import RoleSelector from "@/components/matchup/RoleSelector";
@@ -50,6 +51,10 @@ const Index = () => {
       // also /api/{locale}/openai, but using the un-prefixed route avoids redirect issues.
       const openaiEndpoint = `/api/analyze`;
 
+      // Invisible reCAPTCHA v3 check. Returns null if no site key is configured
+      // yet (see src/lib/recaptcha.ts) so this never blocks the flow locally.
+      const recaptchaToken = await getRecaptchaToken('analyze_matchup');
+
       // Send minimal payload: only language and matchup (role + champion ids)
       const prompt = {
         metadata: { language: locale === 'pt' ? 'pt-BR' : 'en-US' },
@@ -63,7 +68,7 @@ const Index = () => {
       const res = await fetch(openaiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ prompt, recaptchaToken })
       });
 
       // Read raw text first to handle cases where the backend returns
@@ -334,6 +339,28 @@ const Index = () => {
                 )}
               </button>
             </div>
+
+            <p className="text-[10px] text-muted-foreground text-center leading-relaxed px-6">
+              {t("selection.recaptchaPrefix")}{" "}
+              <a
+                href="https://policies.google.com/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-foreground transition-colors"
+              >
+                {t("selection.privacyPolicy")}
+              </a>{" "}
+              {t("selection.recaptchaMiddle")}{" "}
+              <a
+                href="https://policies.google.com/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-foreground transition-colors"
+              >
+                {t("selection.termsOfService")}
+              </a>{" "}
+              {t("selection.recaptchaSuffix")}
+            </p>
 
             {isDebug && (
               <div className="space-y-2 border border-dashed border-muted-foreground/30 rounded-lg p-4">

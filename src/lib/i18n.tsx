@@ -32,6 +32,14 @@ const translations = {
   "selection.analyzing": { pt: "Analisando...", en: "Analyzing..." },
   "selection.searchChampion": { pt: "Buscar campeão...", en: "Search champion..." },
   "selection.noChampions": { pt: "Nenhum campeão encontrado", en: "No champions found" },
+  "selection.recaptchaPrefix": {
+    pt: "Este site é protegido por reCAPTCHA e se aplicam a",
+    en: "This site is protected by reCAPTCHA and the Google",
+  },
+  "selection.recaptchaMiddle": { pt: "e os", en: "and" },
+  "selection.recaptchaSuffix": { pt: "do Google.", en: "apply." },
+  "selection.privacyPolicy": { pt: "Política de Privacidade", en: "Privacy Policy" },
+  "selection.termsOfService": { pt: "Termos de Serviço", en: "Terms of Service" },
 
   // Matchup Header
   "matchup.you": { pt: "Você", en: "You" },

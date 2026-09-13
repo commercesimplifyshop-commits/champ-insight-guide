@@ -183,3 +183,11 @@
     box-shadow: var(--shadow-brand);
   }
 }
+
+/* Google reCAPTCHA v3 injects a floating badge that clashes with the layout
+   on both mobile and desktop. Hiding it is allowed by Google's terms as long
+   as the required disclosure text is shown elsewhere (see selection.recaptcha*
+   strings rendered in src/pages/Index.tsx). */
+.grecaptcha-badge {
+  visibility: hidden;
+}

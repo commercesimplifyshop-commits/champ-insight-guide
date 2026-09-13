@@ -61,6 +61,26 @@ Useful commands
 - Build: `npm run build`
 - Preview build: `npm run preview`
 
+Bot protection (Google reCAPTCHA v3)
+- The champion-selection form runs an invisible reCAPTCHA v3 check before calling `/api/analyze`. It's free and requires no user interaction — no checkbox, no visible widget (Google's floating badge is hidden via CSS in `src/index.css` and replaced by the required disclosure text under the "Generate Plan" button, per Google's terms).
+- Frontend setup: create a free Site Key at https://www.google.com/recaptcha/admin/create (choose reCAPTCHA v3, add your domain(s) + `localhost`), then set `VITE_RECAPTCHA_SITE_KEY` in `.env`. The Site Key is public/safe to expose. See `src/lib/recaptcha.ts` for the token helper — when the key is unset, verification is skipped (with a console warning in dev) instead of blocking the app.
+- Backend requirement (Laravel, not in this repo): the frontend now sends `recaptchaToken` in the JSON body of `POST /api/analyze`. The token must be verified server-side with the Secret Key (never exposed to the frontend) before proceeding, e.g.:
+
+	```php
+	$response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+		'secret' => config('services.recaptcha.secret'), // RECAPTCHA_SECRET_KEY in Laravel's .env
+		'response' => $request->input('recaptchaToken'),
+		'remoteip' => $request->ip(),
+	]);
+
+	$result = $response->json();
+	if (!($result['success'] ?? false) || ($result['score'] ?? 0) < 0.5) {
+		abort(403, 'Falha na verificação reCAPTCHA');
+	}
+	```
+
+	Until this backend check is added, the token is sent but not enforced — add it to actually block bots.
+
 Contact / notes
 - This repo is used as the canonical UI template. For production integration with the Laravel app, build and copy files into the Laravel `public/build` (manifest required).
 
