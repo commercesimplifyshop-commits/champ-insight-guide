@@ -1,6 +1,6 @@
 import { MatchupOverview as OverviewType, AdvantageLevel } from "@/types/matchup";
 import { Zap, Target, AlertTriangle, Crosshair } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, type TranslationKey } from "@/lib/i18n";
 
 interface QuickOverviewProps {
   overview: OverviewType;
@@ -24,7 +24,7 @@ const QuickOverview = ({ overview }: QuickOverviewProps) => {
       <div className={`${adv.statusBg} px-4 py-2 flex items-center gap-2`}>
         <Zap className={`w-4 h-4 ${adv.statusText}`} />
         <span className={`text-sm font-bold tracking-wider uppercase ${adv.statusText}`}>
-          {t(adv.labelKey as any)}
+          {t(adv.labelKey as TranslationKey)}
         </span>
       </div>
 

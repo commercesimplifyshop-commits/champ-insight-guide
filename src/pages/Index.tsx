@@ -84,6 +84,7 @@ const Index = () => {
       // Read raw text first to handle cases where the backend returns
       // plain text, an OpenAI-style completion object, or a JSON body.
       rawText = await res.text();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- backend response shape is intentionally unvalidated here, see extractJsonFromText below
       let body: any = null;
       try {
         body = JSON.parse(rawText);
@@ -100,13 +101,13 @@ const Index = () => {
       const extractJsonFromText = (text: string) => {
         if (!text) return null;
         // Try direct parse
-        try { return JSON.parse(text); } catch (e) { }
+        try { return JSON.parse(text); } catch (e) { /* not direct JSON, try next strategy */ }
 
         // Try to find triple-backtick blocks (``` or ```json)
         const fence = text.match(/```(?:json)?\n?([\s\S]*?)```/i);
         if (fence && fence[1]) {
           const inside = fence[1].trim();
-          try { return JSON.parse(inside); } catch (e) { }
+          try { return JSON.parse(inside); } catch (e) { /* fenced block wasn't valid JSON either */ }
         }
 
         // Try to extract a JSON object or array substring
@@ -115,19 +116,20 @@ const Index = () => {
           try { return JSON.parse(objMatch[1]); } catch (e) {
             // maybe the JSON contains escaped newlines - try to unescape
             const unescaped = objMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
-            try { return JSON.parse(unescaped); } catch (e) { }
+            try { return JSON.parse(unescaped); } catch (e) { /* give up on object-shaped match */ }
           }
         }
 
         const arrMatch = text.match(/(\[[\s\S]*\])/);
         if (arrMatch) {
-          try { return JSON.parse(arrMatch[1]); } catch (e) { }
+          try { return JSON.parse(arrMatch[1]); } catch (e) { /* give up on array-shaped match */ }
         }
 
         return null;
       };
 
       // Try multiple strategies to locate the embedded plan JSON.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- shape depends on which extraction strategy matched above
       let aiJson: any = null;
 
       if (Array.isArray(body)) {
@@ -179,6 +181,7 @@ const Index = () => {
       // rigid array lengths or enum checks. Use defensive defaults similar to the
       // manual JSON loader so the UI can render whatever reasonable content the
       // AI returned.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- filled in field-by-field with fallback defaults below before being treated as MatchupPlan
       const mappedPlan: any = { ...aiJson };
 
       mappedPlan.type = mappedPlan.type || (role === 'jungle' ? 'jungle' : 'lane');
@@ -206,20 +209,22 @@ const Index = () => {
       mappedPlan.powerSpikes = Array.isArray(mappedPlan.powerSpikes) ? mappedPlan.powerSpikes : [];
       mappedPlan.mistakes = Array.isArray(mappedPlan.mistakes) ? mappedPlan.mistakes : [];
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- defaults applied above make this a valid MatchupPlan at runtime
       setPlan(mappedPlan as any);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Analysis failed', err);
+      const errMessage = err instanceof Error ? err.message : undefined;
       // If parsing failed because no JSON found, populate the debug textarea
       // with the raw response so the user can inspect and load it with
       // the existing "Carregar JSON" button.
-      const isNoJsonError = typeof err?.message === 'string' && err.message.includes('Resposta da IA não contém JSON válido');
+      const isNoJsonError = typeof errMessage === 'string' && errMessage.includes('Resposta da IA não contém JSON válido');
       if (isNoJsonError && rawText) {
-        try { setDebugJson(rawText); } catch (_) { }
+        try { setDebugJson(rawText); } catch (e) { /* debug textarea is best-effort */ }
         console.debug('Raw response loaded into debug textarea:', rawText.slice(0, 1000));
       }
 
       // show a temporary non-blocking notice below the banner instead of alert()
-      const msg = err?.message || 'Erro ao gerar análise com IA';
+      const msg = errMessage || 'Erro ao gerar análise com IA';
       setNotice(msg);
       if (noticeTimeoutRef.current) window.clearTimeout(noticeTimeoutRef.current);
       noticeTimeoutRef.current = window.setTimeout(() => setNotice(null), 12000);
