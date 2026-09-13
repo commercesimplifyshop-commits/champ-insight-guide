@@ -3,6 +3,7 @@ import { Lock, Loader2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import AuthDialog from "@/components/auth/AuthDialog";
+import { redirectToStripeUrl } from "@/lib/stripeRedirect";
 
 interface PremiumGateProps {
   sectionTitles: string[];
@@ -33,7 +34,7 @@ const PremiumGate = ({ sectionTitles }: PremiumGateProps) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      redirectToStripeUrl(data.url);
     } finally {
       setLoading(false);
     }

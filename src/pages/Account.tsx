@@ -5,6 +5,7 @@ import type { MatchupPlan } from "@/types/matchup";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
 import JungleAnalysisView from "@/components/matchup/JungleAnalysisView";
 import Header from "@/components/layout/Header";
+import { redirectToStripeUrl } from "@/lib/stripeRedirect";
 
 interface HistoryItem {
   id: string;
@@ -57,7 +58,7 @@ const Account = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      redirectToStripeUrl(data.url);
     } finally {
       setBillingLoading(false);
     }
@@ -73,7 +74,7 @@ const Account = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      redirectToStripeUrl(data.url);
     } finally {
       setBillingLoading(false);
     }

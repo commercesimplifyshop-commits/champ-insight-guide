@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Crown, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import AuthDialog from "@/components/auth/AuthDialog";
+import { redirectToStripeUrl } from "@/lib/stripeRedirect";
 import type { AppMode } from "@/pages/Index";
 
 const COPY: Record<AppMode, string> = {
@@ -40,7 +41,7 @@ const PricingBanner = ({ mode }: PricingBannerProps) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      redirectToStripeUrl(data.url);
     } finally {
       setCheckoutLoading(false);
     }

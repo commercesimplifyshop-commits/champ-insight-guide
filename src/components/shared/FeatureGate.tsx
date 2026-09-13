@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { Loader2, Crown } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import AuthDialog from "@/components/auth/AuthDialog";
+import { redirectToStripeUrl } from "@/lib/stripeRedirect";
 
 interface FeatureGateProps {
   title: string;
@@ -41,7 +42,7 @@ const FeatureGate = ({ title, description, children }: FeatureGateProps) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      redirectToStripeUrl(data.url);
     } finally {
       setCheckoutLoading(false);
     }

@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import AuthDialog from "@/components/auth/AuthDialog";
+import { redirectToStripeUrl } from "@/lib/stripeRedirect";
 
 interface FeatureRow {
   label: string;
@@ -48,7 +49,7 @@ const Pricing = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
+      redirectToStripeUrl(data.url);
     } finally {
       setLoading(false);
     }
