@@ -6,6 +6,7 @@ import { MOCK_JUNGLE_PLAN } from "@/data/mock-jungle-matchup";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { getRecaptchaToken } from "@/lib/recaptcha";
+import { isAdsenseConfigured, requestRewardedAd } from "@/lib/adsense";
 
 import HeroBanner from "@/components/matchup/HeroBanner";
 import RoleSelector from "@/components/matchup/RoleSelector";
@@ -29,11 +30,12 @@ const Index = () => {
   const [ally, setAlly] = useState<Champion | null>(null);
   const [enemy, setEnemy] = useState<Champion | null>(null);
   const [loading, setLoading] = useState(false);
+  const [adGateLoading, setAdGateLoading] = useState(false);
   const [plan, setPlan] = useState<MatchupPlan | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const noticeTimeoutRef = useRef<number | null>(null);
   const { locale, t } = useI18n();
-  const { getAccessToken } = useAuth();
+  const { getAccessToken, isPremium } = useAuth();
 
   useEffect(() => {
     return () => {
@@ -46,8 +48,13 @@ const Index = () => {
 
   const canAnalyze = role && ally && enemy;
 
-  const handleAnalyze = async () => {
-    if (!canAnalyze) return;
+  const showNotice = (msg: string) => {
+    setNotice(msg);
+    if (noticeTimeoutRef.current) window.clearTimeout(noticeTimeoutRef.current);
+    noticeTimeoutRef.current = window.setTimeout(() => setNotice(null), 12000);
+  };
+
+  const runAnalysis = async () => {
     setLoading(true);
     let rawText = '';
     try {
@@ -226,12 +233,33 @@ const Index = () => {
       }
 
       // show a temporary non-blocking notice below the banner instead of alert()
-      const msg = errMessage || 'Erro ao gerar análise com IA';
-      setNotice(msg);
-      if (noticeTimeoutRef.current) window.clearTimeout(noticeTimeoutRef.current);
-      noticeTimeoutRef.current = window.setTimeout(() => setNotice(null), 12000);
+      showNotice(errMessage || 'Erro ao gerar análise com IA');
     } finally {
       setLoading(false);
+    }
+  };
+
+  /**
+   * Free (non-premium) users watch a short rewarded ad before spending our
+   * OpenAI budget on a new analysis — premium users and environments where
+   * AdSense isn't configured (local/preview) skip straight to generating.
+   */
+  const handleGenerateClick = async () => {
+    if (!canAnalyze) return;
+
+    if (isPremium || !isAdsenseConfigured()) {
+      await runAnalysis();
+      return;
+    }
+
+    setAdGateLoading(true);
+    const outcome = await requestRewardedAd('generate_analysis');
+    setAdGateLoading(false);
+
+    if (outcome === 'viewed') {
+      await runAnalysis();
+    } else {
+      showNotice(t('ads.rewardDismissed'));
     }
   };
 
@@ -313,14 +341,19 @@ const Index = () => {
 
                 <div className="flex justify-center pt-2">
                   <button
-                    onClick={handleAnalyze}
-                    disabled={!canAnalyze || loading}
+                    onClick={handleGenerateClick}
+                    disabled={!canAnalyze || loading || adGateLoading}
                     className={`px-8 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${canAnalyze
                       ? "bg-brand text-primary-foreground hover:brightness-110 shadow-brand"
                       : "surface-2 text-muted-foreground cursor-not-allowed"
                       }`}
                   >
-                    {loading ? (
+                    {adGateLoading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        {t("ads.loadingAd")}
+                      </span>
+                    ) : loading ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="w-4 h-4 animate-spin" />
                         {t("selection.analyzing")}
@@ -330,6 +363,12 @@ const Index = () => {
                     )}
                   </button>
                 </div>
+
+                {!isPremium && isAdsenseConfigured() && (
+                  <p className="text-[10px] text-muted-foreground/70 text-center">
+                    {t("ads.rewardHint")}
+                  </p>
+                )}
 
                 <p className="text-[10px] text-muted-foreground text-center leading-relaxed px-6">
                   {t("selection.recaptchaPrefix")}{" "}
