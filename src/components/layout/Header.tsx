@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Swords, UserCircle2, Crown } from "lucide-react";
+import { Swords, UserCircle2, Crown, ShieldCheck } from "lucide-react";
 import { useI18n, type Locale } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import AuthDialog from "@/components/auth/AuthDialog";
@@ -12,7 +12,7 @@ const langOptions: { value: Locale; flag: string; label: string }[] = [
 
 const Header = () => {
   const { locale, setLocale } = useI18n();
-  const { user, isPremium, signOut } = useAuth();
+  const { user, isPremium, isAdmin, signOut } = useAuth();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   return (
@@ -29,6 +29,12 @@ const Header = () => {
               Premium
             </span>
           )}
+          {isAdmin && (
+            <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-info-status text-primary-foreground">
+              <ShieldCheck className="w-2.5 h-2.5" />
+              Admin
+            </span>
+          )}
         </Link>
 
         <div className="flex items-center gap-3">
@@ -38,6 +44,15 @@ const Header = () => {
           >
             Planos
           </Link>
+
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="text-xs font-semibold text-info-status hover:text-foreground transition-colors hidden sm:inline"
+            >
+              Admin
+            </Link>
+          )}
 
           <div className="flex items-center gap-0.5 surface-2 rounded-md p-0.5">
             {langOptions.map((lang) => (
