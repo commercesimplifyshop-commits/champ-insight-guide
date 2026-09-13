@@ -188,8 +188,10 @@ const Index = () => {
 
       mappedPlan.meta = mappedPlan.meta || {
         allyChampion: ally?.name || ally?.id || '',
+        allyChampionId: ally?.id || ally?.name || '',
         allyImage: ally?.image || null,
         enemyChampion: enemy?.name || enemy?.id || '',
+        enemyChampionId: enemy?.id || enemy?.name || '',
         enemyImage: enemy?.image || null,
         role: role,
         difficulty: mappedPlan.overview?.earlyAdvantage?.level || undefined,
