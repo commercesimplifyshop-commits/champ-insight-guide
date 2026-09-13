@@ -143,6 +143,17 @@ const translations = {
   "abilities.howToPlay": { pt: "Como jogar", en: "How to play" },
   "abilities.howToPlayAgainst": { pt: "Como jogar contra", en: "How to play against" },
 
+  // Rewarded ad gate (free users watch a short ad before generating a new analysis)
+  "ads.loadingAd": { pt: "Carregando anúncio...", en: "Loading ad..." },
+  "ads.rewardHint": {
+    pt: "Usuários gratuitos assistem a um anúncio curto antes de gerar a análise. Assinantes PRO não veem anúncios.",
+    en: "Free users watch a short ad before generating the analysis. PRO subscribers see no ads.",
+  },
+  "ads.rewardDismissed": {
+    pt: "Assista o anúncio até o fim para gerar sua análise.",
+    en: "Watch the ad to the end to generate your analysis.",
+  },
+
   // Footer
   "footer.disclaimer": {
     pt: "MATCHUP.GG não é endossado pela Riot Games e não reflete as opiniões da Riot Games ou de qualquer pessoa oficialmente envolvida na produção ou gerenciamento das propriedades da Riot Games.",
