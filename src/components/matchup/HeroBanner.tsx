@@ -12,10 +12,10 @@ const HeroBanner = ({ mode, onSelectMode }: HeroBannerProps) => {
   const { t } = useI18n();
 
   const features = [
-    { icon: Swords, labelKey: "hero.feature.1v1" as const, mode: "matchup" as AppMode, available: true },
-    { icon: Users, labelKey: "hero.feature.5v5" as const, mode: null, available: false },
-    { icon: Shield, labelKey: "hero.feature.counter" as const, mode: "counters" as AppMode, available: true },
-    { icon: Sparkles, labelKey: "hero.feature.coach" as const, mode: null, available: false },
+    { icon: Swords, labelKey: "hero.feature.1v1" as const, mode: "matchup" as AppMode, available: true, pro: false },
+    { icon: Users, labelKey: "hero.feature.5v5" as const, mode: "team" as AppMode, available: true, pro: true },
+    { icon: Shield, labelKey: "hero.feature.counter" as const, mode: "counters" as AppMode, available: true, pro: true },
+    { icon: Sparkles, labelKey: "hero.feature.coach" as const, mode: null, available: false, pro: true },
   ];
 
   return (
@@ -58,11 +58,22 @@ const HeroBanner = ({ mode, onSelectMode }: HeroBannerProps) => {
               >
                 <f.icon className="w-3.5 h-3.5 shrink-0" />
                 <span>{t(f.labelKey)}</span>
-                {!f.available && (
-                  <span className="ml-auto text-[9px] font-mono uppercase tracking-wider opacity-60">
-                    {t("hero.comingSoon")}
-                  </span>
-                )}
+                <span className="ml-auto flex items-center gap-1">
+                  {f.pro && (
+                    <span
+                      className={`text-[8px] font-bold uppercase tracking-wider px-1 py-0.5 rounded ${
+                        isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-brand text-primary-foreground"
+                      }`}
+                    >
+                      PRO
+                    </span>
+                  )}
+                  {!f.available && (
+                    <span className="text-[9px] font-mono uppercase tracking-wider opacity-60">
+                      {t("hero.comingSoon")}
+                    </span>
+                  )}
+                </span>
               </Tag>
             );
           })}

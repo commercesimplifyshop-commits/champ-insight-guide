@@ -17,10 +17,12 @@ import JungleAnalysisView from "@/components/matchup/JungleAnalysisView";
 import QrCodeSupport from "@/components/monetization/QrCodeSupport";
 import AdBanner from "@/components/monetization/AdBanner";
 import CounterFinder from "@/components/counterfinder/CounterFinder";
+import TeamAnalysis from "@/components/teamanalysis/TeamAnalysis";
+import PricingBanner from "@/components/monetization/PricingBanner";
 import Footer from "@/components/layout/Footer";
 import AuthDialog from "@/components/auth/AuthDialog";
 
-export type AppMode = "matchup" | "counters";
+export type AppMode = "matchup" | "counters" | "team";
 
 const langOptions: { value: Locale; flag: string; label: string }[] = [
   { value: "pt", flag: "🇧🇷", label: "PT" },
@@ -323,10 +325,13 @@ const Index = () => {
         <main className="flex-1 min-w-0 max-w-3xl mx-auto space-y-4">
         {!plan ? (
           <div className="space-y-5">
+            <PricingBanner />
             <HeroBanner mode={mode} onSelectMode={setMode} />
 
             {mode === "counters" ? (
               <CounterFinder />
+            ) : mode === "team" ? (
+              <TeamAnalysis />
             ) : (
               <>
                 <div className="text-center space-y-1">

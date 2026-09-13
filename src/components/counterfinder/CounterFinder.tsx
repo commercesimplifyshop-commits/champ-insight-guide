@@ -3,6 +3,8 @@ import { Loader2, Swords } from "lucide-react";
 import type { Role, Champion } from "@/types/matchup";
 import type { CounterFinderResult } from "@/types/counters";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth";
+import FeatureGate from "@/components/shared/FeatureGate";
 import RoleSelector from "@/components/matchup/RoleSelector";
 import ChampionPicker from "@/components/matchup/ChampionPicker";
 
@@ -12,8 +14,9 @@ const threatStyles: Record<CounterFinderResult["counters"][number]["threat"], st
   low: "bg-advantage/15 text-advantage border-advantage/40",
 };
 
-const CounterFinder = () => {
+const CounterFinderForm = () => {
   const { t } = useI18n();
+  const { getAccessToken } = useAuth();
   const [role, setRole] = useState<Role | null>(null);
   const [champion, setChampion] = useState<Champion | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,15 +35,18 @@ const CounterFinder = () => {
         role: role!,
         language: "pt-BR",
       });
-      const res = await fetch(`/api/counters?${params.toString()}`);
+      const token = getAccessToken();
+      const res = await fetch(`/api/counters?${params.toString()}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.error || `Erro ao buscar counters (HTTP ${res.status})`);
       }
       const data = (await res.json()) as CounterFinderResult;
       setResult(data);
-    } catch (err: any) {
-      setError(err?.message || t("counters.error"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("counters.error"));
     } finally {
       setLoading(false);
     }
@@ -161,5 +167,14 @@ const CounterFinder = () => {
     </div>
   );
 };
+
+const CounterFinder = () => (
+  <FeatureGate
+    title="Counter Finder — Premium"
+    description="Descubra os melhores counters sugeridos por IA para qualquer campeão e role."
+  >
+    <CounterFinderForm />
+  </FeatureGate>
+);
 
 export default CounterFinder;
