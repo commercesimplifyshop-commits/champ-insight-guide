@@ -2,10 +2,14 @@ import { createContext, useContext, useEffect, useState, useCallback, type React
 import type { User, Session } from "@supabase/supabase-js";
 import { supabase } from "./supabaseClient";
 
+export type UserRole = "user" | "admin";
+
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
   isPremium: boolean;
+  role: UserRole;
+  isAdmin: boolean;
   refreshPremiumStatus: () => Promise<void>;
   signInWithPassword: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
@@ -20,6 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPremium, setIsPremium] = useState(false);
+  const [role, setRole] = useState<UserRole>("user");
 
   const fetchPremiumStatus = useCallback(async (accessToken: string | undefined) => {
     if (!accessToken) {
@@ -41,6 +46,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const fetchRole = useCallback(async (accessToken: string | undefined) => {
+    if (!accessToken) {
+      setRole("user");
+      return;
+    }
+    try {
+      const res = await fetch("/api/profile", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (!res.ok) {
+        setRole("user");
+        return;
+      }
+      const data = await res.json();
+      setRole(data.role === "admin" ? "admin" : "user");
+    } catch {
+      setRole("user");
+    }
+  }, []);
+
   useEffect(() => {
     if (!supabase) {
       setLoading(false);
@@ -49,16 +74,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
-      fetchPremiumStatus(data.session?.access_token).finally(() => setLoading(false));
+      Promise.all([fetchPremiumStatus(data.session?.access_token), fetchRole(data.session?.access_token)]).finally(() =>
+        setLoading(false),
+      );
     });
 
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
       fetchPremiumStatus(newSession?.access_token);
+      fetchRole(newSession?.access_token);
     });
 
     return () => subscription.subscription.unsubscribe();
-  }, [fetchPremiumStatus]);
+  }, [fetchPremiumStatus, fetchRole]);
 
   const signInWithPassword = async (email: string, password: string) => {
     if (!supabase) return { error: "Login não configurado" };
@@ -97,6 +125,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user: session?.user ?? null,
         loading,
         isPremium,
+        role,
+        isAdmin: role === "admin",
         refreshPremiumStatus,
         signInWithPassword,
         signUp,
