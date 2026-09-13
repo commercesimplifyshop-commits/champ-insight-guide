@@ -7,6 +7,12 @@ Quick status
 - Dev server: vite (default port 5173)
 - Entry: `src/main.tsx` → `src/App.tsx`
 
+Branches & deploy
+- `production` — merging a PR here triggers the real production deploy on Vercel (`www.matchupgg.com`). Protected: PR + passing CI required, no direct pushes.
+- `staging` — integration branch; every push gets a Vercel preview deployment. Protected the same way as `production`.
+- `main` — default branch, kept as a live mirror/backup of `production` via an automated workflow (`.github/workflows/sync-main.yml`) that fast-forwards it after every production merge. Not meant to receive direct commits.
+- CI (`.github/workflows/ci.yml`) runs `tsc --noEmit`, `eslint`, and `npm run build` on every PR and on pushes to the three branches above.
+
 Local development
 
 1. Install dependencies
