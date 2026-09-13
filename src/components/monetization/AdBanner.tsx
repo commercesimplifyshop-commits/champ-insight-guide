@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth";
-import { ADSENSE_CLIENT_ID, ADSENSE_SLOTS, loadDisplayAd } from "@/lib/adsense";
+import { ADSENSE_CLIENT_ID, ADSENSE_SLOTS, isAdsenseConfigured, loadDisplayAd } from "@/lib/adsense";
 
 interface AdBannerProps {
   slot: "left" | "right" | "bottom";
@@ -17,21 +17,23 @@ const AdBanner = ({ slot, className = "" }: AdBannerProps) => {
   const { isPremium } = useAuth();
   const dim = dimensions[slot];
   const slotId = ADSENSE_SLOTS[slot];
+  const configured = isAdsenseConfigured() && Boolean(slotId);
   const requested = useRef(false);
 
   useEffect(() => {
-    if (isPremium || !ADSENSE_CLIENT_ID || !slotId || requested.current) return;
+    if (isPremium || !configured || requested.current) return;
     requested.current = true;
-    void loadDisplayAd();
-  }, [isPremium, slotId]);
+    loadDisplayAd();
+  }, [isPremium, configured]);
 
   // Premium subscribers get an ad-free experience — a perk of subscribing,
   // not just a paywall side-effect.
   if (isPremium) return null;
 
-  // Not configured yet (missing client ID or this slot's ad unit) — keep the
-  // placeholder so layout/dev/preview environments still look right.
-  if (!ADSENSE_CLIENT_ID || !slotId) {
+  // Not configured yet (missing this slot's ad unit, or not on the real
+  // production domain) — keep the placeholder so layout/dev/preview
+  // environments still look right.
+  if (!configured) {
     return (
       <div
         className={`surface-1 border border-dashed border-border rounded-lg flex items-center justify-center ${dim.w} ${dim.h} ${className}`}
