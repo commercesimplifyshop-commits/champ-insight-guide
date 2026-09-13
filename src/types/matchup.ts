@@ -72,8 +72,10 @@ export interface CounterJungling {
 
 export interface MatchupMeta {
   allyChampion: string;
+  allyChampionId: string;
   allyImage: string;
   enemyChampion: string;
+  enemyChampionId: string;
   enemyImage: string;
   role: Role;
   difficulty: AdvantageLevel;

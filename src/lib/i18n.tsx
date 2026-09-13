@@ -137,6 +137,12 @@ const translations = {
   "phase.midGame": { pt: "Mid Game", en: "Mid Game" },
   "phase.lateGame": { pt: "Late Game", en: "Late Game" },
 
+  // Champion Abilities (free educational reference)
+  "abilities.title": { pt: "Habilidades", en: "Abilities" },
+  "abilities.error": { pt: "Não foi possível carregar as habilidades.", en: "Couldn't load abilities." },
+  "abilities.howToPlay": { pt: "Como jogar", en: "How to play" },
+  "abilities.howToPlayAgainst": { pt: "Como jogar contra", en: "How to play against" },
+
   // Footer
   "footer.disclaimer": {
     pt: "MATCHUP.GG não é endossado pela Riot Games e não reflete as opiniões da Riot Games ou de qualquer pessoa oficialmente envolvida na produção ou gerenciamento das propriedades da Riot Games.",

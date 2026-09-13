@@ -4,8 +4,10 @@ export const MOCK_JUNGLE_PLAN: JungleMatchupPlan = {
   type: "jungle",
   meta: {
     allyChampion: "Lee Sin",
+    allyChampionId: "LeeSin",
     allyImage: "https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/LeeSin.png",
     enemyChampion: "Aatrox",
+    enemyChampionId: "Aatrox",
     enemyImage: "https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Aatrox.png",
     role: "jungle",
     difficulty: "slight",

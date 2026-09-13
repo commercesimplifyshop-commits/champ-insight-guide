@@ -23,8 +23,10 @@ export const MOCK_PLAN: LaneMatchupPlan = {
   type: "lane",
   meta: {
     allyChampion: "Garen",
+    allyChampionId: "Garen",
     allyImage: "https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Garen.png",
     enemyChampion: "Darius",
+    enemyChampionId: "Darius",
     enemyImage: "https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/Darius.png",
     role: "top",
     difficulty: "hard",
