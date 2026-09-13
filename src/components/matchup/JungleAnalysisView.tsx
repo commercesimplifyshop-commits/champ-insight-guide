@@ -7,6 +7,7 @@ import PhaseCard from "./PhaseCard";
 import PowerSpikesList from "./PowerSpikesList";
 import ItemBuild from "./ItemBuild";
 import MistakesList from "./MistakesList";
+import PremiumGate from "./PremiumGate";
 
 interface JungleAnalysisViewProps {
   plan: JungleMatchupPlan;
@@ -141,31 +142,6 @@ const JungleAnalysisView = ({ plan }: JungleAnalysisViewProps) => {
       </CollapsibleSection>
 
       <CollapsibleSection
-        title={t("jungle.gankingStrategy")}
-        icon={<Swords className="w-4 h-4" />}
-        iconColorClass="text-caution"
-        defaultOpen={true}
-      >
-        <GankingCard data={plan.gankingStrategy} />
-      </CollapsibleSection>
-
-      <CollapsibleSection
-        title={t("jungle.objectiveControl")}
-        icon={<Target className="w-4 h-4" />}
-        iconColorClass="text-info-status"
-      >
-        <ObjectiveCard data={plan.objectiveControl} />
-      </CollapsibleSection>
-
-      <CollapsibleSection
-        title={t("jungle.counterJungling")}
-        icon={<Shield className="w-4 h-4" />}
-        iconColorClass="text-threat"
-      >
-        <CounterJungleCard data={plan.counterJungling} />
-      </CollapsibleSection>
-
-      <CollapsibleSection
         title={t("lane.powerSpikes")}
         icon={<TrendingUp className="w-4 h-4" />}
         iconColorClass="text-caution"
@@ -174,38 +150,80 @@ const JungleAnalysisView = ({ plan }: JungleAnalysisViewProps) => {
         <PowerSpikesList spikes={plan.powerSpikes} />
       </CollapsibleSection>
 
-      <CollapsibleSection
-        title={plan.midGame.title}
-        icon={<Clock className="w-4 h-4" />}
-        iconColorClass="text-brand"
+      <PremiumGate
+        sectionTitles={[
+          t("jungle.gankingStrategy"),
+          t("jungle.objectiveControl"),
+          t("jungle.counterJungling"),
+          plan.midGame.title,
+          plan.lateGame.title,
+          t("lane.itemization"),
+          t("jungle.mistakes"),
+        ]}
       >
-        <PhaseCard phase={plan.midGame} />
-      </CollapsibleSection>
+        <CollapsibleSection
+          title={t("jungle.gankingStrategy")}
+          icon={<Swords className="w-4 h-4" />}
+          iconColorClass="text-caution"
+          defaultOpen={true}
+        >
+          <GankingCard data={plan.gankingStrategy} />
+        </CollapsibleSection>
 
-      <CollapsibleSection
-        title={plan.lateGame.title}
-        icon={<Moon className="w-4 h-4" />}
-        iconColorClass="text-info-status"
-      >
-        <PhaseCard phase={plan.lateGame} />
-      </CollapsibleSection>
+        <CollapsibleSection
+          title={t("jungle.objectiveControl")}
+          icon={<Target className="w-4 h-4" />}
+          iconColorClass="text-info-status"
+          defaultOpen={true}
+        >
+          <ObjectiveCard data={plan.objectiveControl} />
+        </CollapsibleSection>
 
-      <CollapsibleSection
-        title={t("lane.itemization")}
-        icon={<Package className="w-4 h-4" />}
-        iconColorClass="text-brand"
-      >
-        <ItemBuild itemization={plan.itemization} />
-      </CollapsibleSection>
+        <CollapsibleSection
+          title={t("jungle.counterJungling")}
+          icon={<Shield className="w-4 h-4" />}
+          iconColorClass="text-threat"
+          defaultOpen={true}
+        >
+          <CounterJungleCard data={plan.counterJungling} />
+        </CollapsibleSection>
 
-      <CollapsibleSection
-        title={t("jungle.mistakes")}
-        icon={<XOctagon className="w-4 h-4" />}
-        iconColorClass="text-threat"
-        defaultOpen={true}
-      >
-        <MistakesList mistakes={plan.mistakes} />
-      </CollapsibleSection>
+        <CollapsibleSection
+          title={plan.midGame.title}
+          icon={<Clock className="w-4 h-4" />}
+          iconColorClass="text-brand"
+          defaultOpen={true}
+        >
+          <PhaseCard phase={plan.midGame} />
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title={plan.lateGame.title}
+          icon={<Moon className="w-4 h-4" />}
+          iconColorClass="text-info-status"
+          defaultOpen={true}
+        >
+          <PhaseCard phase={plan.lateGame} />
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title={t("lane.itemization")}
+          icon={<Package className="w-4 h-4" />}
+          iconColorClass="text-brand"
+          defaultOpen={true}
+        >
+          <ItemBuild itemization={plan.itemization} />
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title={t("jungle.mistakes")}
+          icon={<XOctagon className="w-4 h-4" />}
+          iconColorClass="text-threat"
+          defaultOpen={true}
+        >
+          <MistakesList mistakes={plan.mistakes} />
+        </CollapsibleSection>
+      </PremiumGate>
     </>
   );
 };

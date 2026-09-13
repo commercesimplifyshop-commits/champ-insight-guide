@@ -129,6 +129,13 @@ const translations = {
     en: "AI-generated suggestions based on general game knowledge, not real match statistics.",
   },
 
+  // Premium gate (free vs. full analysis)
+  "premium.description": {
+    pt: "Fases de mid/late game, itemização completa e erros a evitar",
+    en: "Mid/late game phases, full itemization and mistakes to avoid",
+  },
+  "premium.unlock": { pt: "Ver Análise Completa", en: "See Full Analysis" },
+
   // Footer
   "footer.disclaimer": {
     pt: "MATCHUP.GG não é endossado pela Riot Games e não reflete as opiniões da Riot Games ou de qualquer pessoa oficialmente envolvida na produção ou gerenciamento das propriedades da Riot Games.",

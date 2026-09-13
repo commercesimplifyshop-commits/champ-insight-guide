@@ -8,6 +8,7 @@ import JungleControlCard from "./JungleControlCard";
 import PowerSpikesList from "./PowerSpikesList";
 import ItemBuild from "./ItemBuild";
 import MistakesList from "./MistakesList";
+import PremiumGate from "./PremiumGate";
 
 interface LaneAnalysisViewProps {
   plan: LaneMatchupPlan;
@@ -30,14 +31,6 @@ const LaneAnalysisView = ({ plan }: LaneAnalysisViewProps) => {
       </CollapsibleSection>
 
       <CollapsibleSection
-        title={t("lane.visionJungle")}
-        icon={<Map className="w-4 h-4" />}
-        iconColorClass="text-info-status"
-      >
-        <JungleControlCard data={plan.jungleControl} />
-      </CollapsibleSection>
-
-      <CollapsibleSection
         title={t("lane.powerSpikes")}
         icon={<TrendingUp className="w-4 h-4" />}
         iconColorClass="text-caution"
@@ -46,38 +39,60 @@ const LaneAnalysisView = ({ plan }: LaneAnalysisViewProps) => {
         <PowerSpikesList spikes={plan.powerSpikes} />
       </CollapsibleSection>
 
-      <CollapsibleSection
-        title={plan.midGame.title}
-        icon={<Clock className="w-4 h-4" />}
-        iconColorClass="text-brand"
+      <PremiumGate
+        sectionTitles={[
+          t("lane.visionJungle"),
+          plan.midGame.title,
+          plan.lateGame.title,
+          t("lane.itemization"),
+          t("lane.mistakes"),
+        ]}
       >
-        <PhaseCard phase={plan.midGame} />
-      </CollapsibleSection>
+        <CollapsibleSection
+          title={t("lane.visionJungle")}
+          icon={<Map className="w-4 h-4" />}
+          iconColorClass="text-info-status"
+          defaultOpen={true}
+        >
+          <JungleControlCard data={plan.jungleControl} />
+        </CollapsibleSection>
 
-      <CollapsibleSection
-        title={plan.lateGame.title}
-        icon={<Moon className="w-4 h-4" />}
-        iconColorClass="text-info-status"
-      >
-        <PhaseCard phase={plan.lateGame} />
-      </CollapsibleSection>
+        <CollapsibleSection
+          title={plan.midGame.title}
+          icon={<Clock className="w-4 h-4" />}
+          iconColorClass="text-brand"
+          defaultOpen={true}
+        >
+          <PhaseCard phase={plan.midGame} />
+        </CollapsibleSection>
 
-      <CollapsibleSection
-        title={t("lane.itemization")}
-        icon={<Package className="w-4 h-4" />}
-        iconColorClass="text-brand"
-      >
-        <ItemBuild itemization={plan.itemization} />
-      </CollapsibleSection>
+        <CollapsibleSection
+          title={plan.lateGame.title}
+          icon={<Moon className="w-4 h-4" />}
+          iconColorClass="text-info-status"
+          defaultOpen={true}
+        >
+          <PhaseCard phase={plan.lateGame} />
+        </CollapsibleSection>
 
-      <CollapsibleSection
-        title={t("lane.mistakes")}
-        icon={<XOctagon className="w-4 h-4" />}
-        iconColorClass="text-threat"
-        defaultOpen={true}
-      >
-        <MistakesList mistakes={plan.mistakes} />
-      </CollapsibleSection>
+        <CollapsibleSection
+          title={t("lane.itemization")}
+          icon={<Package className="w-4 h-4" />}
+          iconColorClass="text-brand"
+          defaultOpen={true}
+        >
+          <ItemBuild itemization={plan.itemization} />
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          title={t("lane.mistakes")}
+          icon={<XOctagon className="w-4 h-4" />}
+          iconColorClass="text-threat"
+          defaultOpen={true}
+        >
+          <MistakesList mistakes={plan.mistakes} />
+        </CollapsibleSection>
+      </PremiumGate>
     </>
   );
 };
