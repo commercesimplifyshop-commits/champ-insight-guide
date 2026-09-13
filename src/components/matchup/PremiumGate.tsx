@@ -1,23 +1,43 @@
-import { useState, type ReactNode } from "react";
-import { Lock } from "lucide-react";
+import { useState } from "react";
+import { Lock, Loader2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth";
+import AuthDialog from "@/components/auth/AuthDialog";
 
 interface PremiumGateProps {
   sectionTitles: string[];
-  children: ReactNode;
 }
 
 /**
- * Progressive-disclosure wrapper for the "deeper" part of the analysis.
- * No real paywall exists yet — unlocking is a plain client-side reveal — but
- * the interaction is already shaped so a future subscription check can swap
- * in for the unlock action without touching the surrounding layout.
+ * Rendered only when the backend actually omitted the deeper sections
+ * (plan.meta.locked === true) — there's no local data to reveal here, so
+ * unlocking means logging in and/or subscribing, not a client-side toggle.
  */
-const PremiumGate = ({ sectionTitles, children }: PremiumGateProps) => {
+const PremiumGate = ({ sectionTitles }: PremiumGateProps) => {
   const { t } = useI18n();
-  const [unlocked, setUnlocked] = useState(false);
+  const { user, getAccessToken } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  if (unlocked) return <>{children}</>;
+  const handleClick = async () => {
+    if (!user) {
+      setAuthOpen(true);
+      return;
+    }
+    const token = getAccessToken();
+    if (!token) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="relative rounded-lg border border-dashed border-brand/40 surface-1 overflow-hidden">
@@ -36,12 +56,16 @@ const PremiumGate = ({ sectionTitles, children }: PremiumGateProps) => {
           {t("premium.description")}
         </p>
         <button
-          onClick={() => setUnlocked(true)}
-          className="mt-1 px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-brand text-primary-foreground hover:brightness-110 shadow-brand transition-all"
+          onClick={handleClick}
+          disabled={loading}
+          className="mt-1 px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-brand text-primary-foreground hover:brightness-110 shadow-brand transition-all disabled:opacity-60 flex items-center gap-2"
         >
-          {t("premium.unlock")}
+          {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+          {user ? t("premium.subscribe") : t("premium.loginToUnlock")}
         </button>
       </div>
+
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
     </div>
   );
 };

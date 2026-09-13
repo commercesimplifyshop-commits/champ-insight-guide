@@ -18,12 +18,13 @@ export interface LaneMatchupPlan {
   meta: MatchupMeta;
   overview: MatchupOverview;
   earlyGame: GamePhase;
-  jungleControl: JungleControl;
   powerSpikes: PowerSpike[];
-  midGame: GamePhase;
-  lateGame: GamePhase;
-  itemization: Itemization;
-  mistakes: MistakeItem[];
+  // Omitted by the backend for non-premium responses (see meta.locked).
+  jungleControl?: JungleControl;
+  midGame?: GamePhase;
+  lateGame?: GamePhase;
+  itemization?: Itemization;
+  mistakes?: MistakeItem[];
 }
 
 /** Jungle-specific strategic plan */
@@ -32,14 +33,15 @@ export interface JungleMatchupPlan {
   meta: MatchupMeta;
   overview: MatchupOverview;
   clearPath: JungleClearPath;
-  gankingStrategy: GankingStrategy;
-  objectiveControl: ObjectiveControl;
-  counterJungling: CounterJungling;
   powerSpikes: PowerSpike[];
-  midGame: GamePhase;
-  lateGame: GamePhase;
-  itemization: Itemization;
-  mistakes: MistakeItem[];
+  // Omitted by the backend for non-premium responses (see meta.locked).
+  gankingStrategy?: GankingStrategy;
+  objectiveControl?: ObjectiveControl;
+  counterJungling?: CounterJungling;
+  midGame?: GamePhase;
+  lateGame?: GamePhase;
+  itemization?: Itemization;
+  mistakes?: MistakeItem[];
 }
 
 export type MatchupPlan = LaneMatchupPlan | JungleMatchupPlan;
@@ -77,6 +79,8 @@ export interface MatchupMeta {
   difficulty: AdvantageLevel;
   winRate: string;
   patch: string;
+  /** true when the deeper sections below were omitted by the backend (free preview). */
+  locked?: boolean;
 }
 
 /** The DOMINANT first-glance section */

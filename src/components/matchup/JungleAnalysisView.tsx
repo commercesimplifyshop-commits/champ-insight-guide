@@ -127,6 +127,9 @@ const CounterJungleCard = ({ data }: { data: JungleMatchupPlan["counterJungling"
 
 const JungleAnalysisView = ({ plan }: JungleAnalysisViewProps) => {
   const { t } = useI18n();
+  const locked = plan.meta.locked ?? false;
+  const hasFullData =
+    !locked && plan.gankingStrategy && plan.objectiveControl && plan.counterJungling && plan.midGame && plan.lateGame && plan.itemization && plan.mistakes;
 
   return (
     <>
@@ -150,17 +153,20 @@ const JungleAnalysisView = ({ plan }: JungleAnalysisViewProps) => {
         <PowerSpikesList spikes={plan.powerSpikes} />
       </CollapsibleSection>
 
-      <PremiumGate
-        sectionTitles={[
-          t("jungle.gankingStrategy"),
-          t("jungle.objectiveControl"),
-          t("jungle.counterJungling"),
-          plan.midGame.title,
-          plan.lateGame.title,
-          t("lane.itemization"),
-          t("jungle.mistakes"),
-        ]}
-      >
+      {!hasFullData ? (
+        <PremiumGate
+          sectionTitles={[
+            t("jungle.gankingStrategy"),
+            t("jungle.objectiveControl"),
+            t("jungle.counterJungling"),
+            t("phase.midGame"),
+            t("phase.lateGame"),
+            t("lane.itemization"),
+            t("jungle.mistakes"),
+          ]}
+        />
+      ) : (
+      <>
         <CollapsibleSection
           title={t("jungle.gankingStrategy")}
           icon={<Swords className="w-4 h-4" />}
@@ -223,7 +229,8 @@ const JungleAnalysisView = ({ plan }: JungleAnalysisViewProps) => {
         >
           <MistakesList mistakes={plan.mistakes} />
         </CollapsibleSection>
-      </PremiumGate>
+      </>
+      )}
     </>
   );
 };

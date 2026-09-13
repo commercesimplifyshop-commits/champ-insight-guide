@@ -135,6 +135,10 @@ const translations = {
     en: "Mid/late game phases, full itemization and mistakes to avoid",
   },
   "premium.unlock": { pt: "Ver Análise Completa", en: "See Full Analysis" },
+  "premium.subscribe": { pt: "Assinar Premium", en: "Subscribe" },
+  "premium.loginToUnlock": { pt: "Entrar para Assinar", en: "Log In to Subscribe" },
+  "phase.midGame": { pt: "Mid Game", en: "Mid Game" },
+  "phase.lateGame": { pt: "Late Game", en: "Late Game" },
 
   // Footer
   "footer.disclaimer": {

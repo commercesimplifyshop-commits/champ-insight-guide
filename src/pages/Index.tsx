@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Swords, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Swords, Loader2, UserCircle2 } from "lucide-react";
 import type { Role, Champion, MatchupPlan } from "@/types/matchup";
 import { MOCK_PLAN } from "@/data/mock-matchup";
 import { MOCK_JUNGLE_PLAN } from "@/data/mock-jungle-matchup";
 import { useI18n, type Locale } from "@/lib/i18n";
+import { useAuth } from "@/lib/auth";
 import { getRecaptchaToken } from "@/lib/recaptcha";
 
 import HeroBanner from "@/components/matchup/HeroBanner";
@@ -16,6 +18,7 @@ import QrCodeSupport from "@/components/monetization/QrCodeSupport";
 import AdBanner from "@/components/monetization/AdBanner";
 import CounterFinder from "@/components/counterfinder/CounterFinder";
 import Footer from "@/components/layout/Footer";
+import AuthDialog from "@/components/auth/AuthDialog";
 
 export type AppMode = "matchup" | "counters";
 
@@ -34,6 +37,8 @@ const Index = () => {
   const [notice, setNotice] = useState<string | null>(null);
   const noticeTimeoutRef = useRef<number | null>(null);
   const { locale, setLocale, t } = useI18n();
+  const { user, signOut, getAccessToken, refreshPremiumStatus } = useAuth();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -70,9 +75,14 @@ const Index = () => {
         }
       };
 
+      const accessToken = getAccessToken();
       const res = await fetch(openaiEndpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify({ prompt, recaptchaToken })
       });
 
@@ -272,9 +282,36 @@ const Index = () => {
             <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider hidden sm:inline">
               {t("header.subtitle")}
             </span>
+
+            {user ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/account"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-foreground hover:text-brand transition-colors"
+                >
+                  <UserCircle2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Minha Conta</span>
+                </Link>
+                <button
+                  onClick={signOut}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Sair
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAuthDialogOpen(true)}
+                className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md bg-brand text-primary-foreground hover:brightness-110 transition-all"
+              >
+                Entrar
+              </button>
+            )}
           </div>
         </div>
       </header>
+
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
         {/* Left sidebar — Ad */}
