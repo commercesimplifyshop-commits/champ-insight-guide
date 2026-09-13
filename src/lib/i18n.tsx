@@ -152,7 +152,7 @@ const translations = {
   "support.scanMessage": { pt: "Escaneie para contribuir via Pix", en: "Scan to contribute" },
 } as const;
 
-type TranslationKey = keyof typeof translations;
+export type TranslationKey = keyof typeof translations;
 
 interface I18nContextValue {
   locale: Locale;
