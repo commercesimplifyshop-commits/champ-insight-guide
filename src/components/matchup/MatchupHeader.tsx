@@ -1,5 +1,5 @@
 import { MatchupMeta, AdvantageLevel } from "@/types/matchup";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, type TranslationKey } from "@/lib/i18n";
 
 interface MatchupHeaderProps {
   meta: MatchupMeta;
@@ -54,7 +54,7 @@ const MatchupHeader = ({ meta, onReset }: MatchupHeaderProps) => {
       <div className="flex items-center gap-4 text-xs">
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground uppercase tracking-wider">{t("matchup.difficulty")}:</span>
-          <span className={`font-bold ${diff.class}`}>{t(diff.labelKey as any)}</span>
+          <span className={`font-bold ${diff.class}`}>{t(diff.labelKey as TranslationKey)}</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground uppercase tracking-wider">WR:</span>

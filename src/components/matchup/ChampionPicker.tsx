@@ -18,8 +18,6 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<number | null>(null);
   const { t } = useI18n();
-  // some i18n implementations use strict key types; cast to any for optional keys used here
-  const loadingLabel = (t as any)('common.loading') || 'Loading...';
 
   useEffect(() => {
     // cleanup on unmount
@@ -34,7 +32,8 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
 
     setLoading(true);
     try {
-      const localePrefix = (typeof window !== 'undefined' && (window as any).__LOCALE__) ? `/api/${(window as any).__LOCALE__}` : '/api';
+      const globalLocale = (window as Window & { __LOCALE__?: string }).__LOCALE__;
+      const localePrefix = typeof window !== 'undefined' && globalLocale ? `/api/${globalLocale}` : '/api';
       const res = await fetch(`${localePrefix}/champions?q=${encodeURIComponent(term)}`, { headers: { Accept: 'application/json' } });
       if (!res.ok) {
         setSuggestions([]);
@@ -85,7 +84,6 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
               setOpen(true);
               if (debounceRef.current) window.clearTimeout(debounceRef.current);
               // debounce 250ms
-              // @ts-ignore
               debounceRef.current = window.setTimeout(() => fetchSuggestions(v), 250);
             }}
             onFocus={() => setOpen(true)}

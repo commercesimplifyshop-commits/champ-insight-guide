@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Loader2, Swords } from "lucide-react";
 import type { Role, Champion } from "@/types/matchup";
 import type { CounterFinderResult } from "@/types/counters";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, type TranslationKey } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import FeatureGate from "@/components/shared/FeatureGate";
 import RoleSelector from "@/components/matchup/RoleSelector";
@@ -97,7 +97,7 @@ const CounterFinderForm = () => {
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="font-semibold text-sm text-foreground">{c.name}</p>
                   <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${threatStyles[c.threat]}`}>
-                    {t(`counters.threat.${c.threat}` as any)}
+                    {t(`counters.threat.${c.threat}` as TranslationKey)}
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{c.reason}</p>
