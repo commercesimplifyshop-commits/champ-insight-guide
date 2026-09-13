@@ -9,6 +9,7 @@ import PowerSpikesList from "./PowerSpikesList";
 import ItemBuild from "./ItemBuild";
 import MistakesList from "./MistakesList";
 import PremiumGate from "./PremiumGate";
+import ChampionAbilities from "./ChampionAbilities";
 
 interface LaneAnalysisViewProps {
   plan: LaneMatchupPlan;
@@ -21,6 +22,9 @@ const LaneAnalysisView = ({ plan }: LaneAnalysisViewProps) => {
   return (
     <>
       <QuickOverview overview={plan.overview} />
+
+      <ChampionAbilities championId={plan.meta.allyChampionId} championName={plan.meta.allyChampion} side="ally" />
+      <ChampionAbilities championId={plan.meta.enemyChampionId} championName={plan.meta.enemyChampion} side="enemy" />
 
       <CollapsibleSection
         title={plan.earlyGame.title}
