@@ -2,12 +2,24 @@ import { useState } from "react";
 import { Crown, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import AuthDialog from "@/components/auth/AuthDialog";
+import type { AppMode } from "@/pages/Index";
+
+const COPY: Record<AppMode, string> = {
+  matchup: "Desbloqueie a análise completa do 1v1 — mid/late game, itemização e erros a evitar",
+  counters: "Desbloqueie o Counter Finder ilimitado",
+  team: "Desbloqueie a Análise 5v5 completa — estratégia de time gerada por IA",
+};
+
+interface PricingBannerProps {
+  mode: AppMode;
+}
 
 /**
  * Promotional banner shown to non-premium visitors. Hides itself once the
  * user is already subscribed — no point advertising to existing customers.
+ * Copy adapts to whichever feature the visitor currently has open.
  */
-const PricingBanner = () => {
+const PricingBanner = ({ mode }: PricingBannerProps) => {
   const { user, isPremium, loading, getAccessToken } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -41,7 +53,7 @@ const PricingBanner = () => {
           <Crown className="w-4 h-4 text-brand" />
         </div>
         <p className="text-xs text-foreground/90 leading-snug">
-          <span className="font-bold text-brand">MATCHUP.GG Premium</span> — análise completa, 5v5 e Counter Finder por{" "}
+          <span className="font-bold text-brand">MATCHUP.GG Premium</span> — {COPY[mode]} por{" "}
           <span className="font-bold text-foreground">R$19,90/mês</span>
         </p>
       </div>

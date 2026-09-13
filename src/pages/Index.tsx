@@ -1,10 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Swords, Loader2, UserCircle2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import type { Role, Champion, MatchupPlan } from "@/types/matchup";
 import { MOCK_PLAN } from "@/data/mock-matchup";
 import { MOCK_JUNGLE_PLAN } from "@/data/mock-jungle-matchup";
-import { useI18n, type Locale } from "@/lib/i18n";
+import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { getRecaptchaToken } from "@/lib/recaptcha";
 
@@ -20,14 +19,9 @@ import CounterFinder from "@/components/counterfinder/CounterFinder";
 import TeamAnalysis from "@/components/teamanalysis/TeamAnalysis";
 import PricingBanner from "@/components/monetization/PricingBanner";
 import Footer from "@/components/layout/Footer";
-import AuthDialog from "@/components/auth/AuthDialog";
+import Header from "@/components/layout/Header";
 
 export type AppMode = "matchup" | "counters" | "team";
-
-const langOptions: { value: Locale; flag: string; label: string }[] = [
-  { value: "pt", flag: "🇧🇷", label: "PT" },
-  { value: "en", flag: "🇺🇸", label: "EN" },
-];
 
 const Index = () => {
   const [mode, setMode] = useState<AppMode>("matchup");
@@ -38,9 +32,8 @@ const Index = () => {
   const [plan, setPlan] = useState<MatchupPlan | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const noticeTimeoutRef = useRef<number | null>(null);
-  const { locale, setLocale, t } = useI18n();
-  const { user, signOut, getAccessToken, refreshPremiumStatus } = useAuth();
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const { locale, t } = useI18n();
+  const { getAccessToken } = useAuth();
 
   useEffect(() => {
     return () => {
@@ -253,67 +246,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navbar */}
-      <header className="surface-1 border-b border-border sticky top-0 z-40">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Swords className="w-5 h-5 text-brand" />
-            <span className="font-bold text-sm tracking-wider text-foreground">
-              MATCHUP<span className="text-brand">.GG</span>
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Language Switcher */}
-            <div className="flex items-center gap-0.5 surface-2 rounded-md p-0.5">
-              {langOptions.map((lang) => (
-                <button
-                  key={lang.value}
-                  onClick={() => setLocale(lang.value)}
-                  className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold transition-colors ${locale === lang.value
-                    ? "bg-brand text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                    }`}
-                >
-                  <span>{lang.flag}</span>
-                  <span>{lang.label}</span>
-                </button>
-              ))}
-            </div>
-
-            <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider hidden sm:inline">
-              {t("header.subtitle")}
-            </span>
-
-            {user ? (
-              <div className="flex items-center gap-2">
-                <Link
-                  to="/account"
-                  className="flex items-center gap-1.5 text-xs font-semibold text-foreground hover:text-brand transition-colors"
-                >
-                  <UserCircle2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Minha Conta</span>
-                </Link>
-                <button
-                  onClick={signOut}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Sair
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setAuthDialogOpen(true)}
-                className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md bg-brand text-primary-foreground hover:brightness-110 transition-all"
-              >
-                Entrar
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
-
-      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
+      <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
         {/* Left sidebar — Ad */}
@@ -325,7 +258,7 @@ const Index = () => {
         <main className="flex-1 min-w-0 max-w-3xl mx-auto space-y-4">
         {!plan ? (
           <div className="space-y-5">
-            <PricingBanner />
+            <PricingBanner mode={mode} />
             <HeroBanner mode={mode} onSelectMode={setMode} />
 
             {mode === "counters" ? (

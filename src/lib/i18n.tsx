@@ -3,9 +3,6 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 export type Locale = "pt" | "en";
 
 const translations = {
-  // Header
-  "header.subtitle": { pt: "Estrategista Tático", en: "Strategic Coach" },
-
   // Hero Banner
   "hero.badge": { pt: "Powered by AI", en: "Powered by AI" },
   "hero.title1": { pt: "Domine cada partida com", en: "Dominate every game with" },

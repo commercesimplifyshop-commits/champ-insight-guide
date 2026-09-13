@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { Loader2, ArrowLeft, Crown, History as HistoryIcon, BarChart3 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import type { MatchupPlan } from "@/types/matchup";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
 import JungleAnalysisView from "@/components/matchup/JungleAnalysisView";
+import Header from "@/components/layout/Header";
 
 interface HistoryItem {
   id: string;
@@ -89,11 +89,11 @@ const Account = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center">
-        <p className="text-sm text-muted-foreground">Você precisa entrar para ver sua conta.</p>
-        <Link to="/" className="text-sm font-semibold text-brand underline">
-          Voltar para a home
-        </Link>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="flex flex-col items-center justify-center gap-4 px-4 text-center py-20">
+          <p className="text-sm text-muted-foreground">Você precisa entrar para ver sua conta.</p>
+        </div>
       </div>
     );
   }
@@ -101,6 +101,7 @@ const Account = () => {
   if (selected) {
     return (
       <div className="min-h-screen bg-background">
+        <Header />
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
           <button
             onClick={() => setSelected(null)}
@@ -120,11 +121,8 @@ const Account = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
-        <Link to="/" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-fit">
-          <ArrowLeft className="w-3.5 h-3.5" /> Voltar
-        </Link>
-
         <h1 className="text-lg font-extrabold text-foreground">Minha Conta</h1>
         <p className="text-xs text-muted-foreground -mt-3">{user.email}</p>
 
