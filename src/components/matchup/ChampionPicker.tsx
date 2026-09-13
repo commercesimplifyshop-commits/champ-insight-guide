@@ -5,7 +5,7 @@ import { useI18n } from "@/lib/i18n";
 
 interface ChampionPickerProps {
   label: string;
-  side: "ally" | "enemy";
+  side: "ally" | "enemy" | "neutral";
   selected: Champion | null;
   onSelect: (champion: Champion) => void;
   onClear: () => void;
@@ -51,7 +51,7 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
     }
   };
 
-  const borderClass = side === "ally" ? "border-info-status" : "border-threat";
+  const borderClass = side === "ally" ? "border-info-status" : side === "enemy" ? "border-threat" : "border-brand";
 
   if (selected) {
     return (
@@ -112,6 +112,11 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
                 >
                   <img src={c.image} alt={c.name} className="w-8 h-8 rounded" />
                   <span className="text-[10px] text-foreground/70 truncate w-full text-center">{c.name}</span>
+                  {c.role && (
+                    <span className="text-[8px] text-muted-foreground/70 uppercase tracking-wide truncate w-full text-center">
+                      {c.role}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>

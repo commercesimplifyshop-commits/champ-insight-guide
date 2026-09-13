@@ -1,15 +1,21 @@
 import { Swords, Users, Shield, Sparkles } from "lucide-react";
 import heroBg from "@/assets/hero-banner-mobile.jpg";
 import { useI18n } from "@/lib/i18n";
+import type { AppMode } from "@/pages/Index";
 
-const HeroBanner = () => {
+interface HeroBannerProps {
+  mode: AppMode;
+  onSelectMode: (mode: AppMode) => void;
+}
+
+const HeroBanner = ({ mode, onSelectMode }: HeroBannerProps) => {
   const { t } = useI18n();
 
   const features = [
-    { icon: Swords, labelKey: "hero.feature.1v1" as const, available: true },
-    { icon: Users, labelKey: "hero.feature.5v5" as const, available: false },
-    { icon: Shield, labelKey: "hero.feature.counter" as const, available: false },
-    { icon: Sparkles, labelKey: "hero.feature.coach" as const, available: false },
+    { icon: Swords, labelKey: "hero.feature.1v1" as const, mode: "matchup" as AppMode, available: true },
+    { icon: Users, labelKey: "hero.feature.5v5" as const, mode: null, available: false },
+    { icon: Shield, labelKey: "hero.feature.counter" as const, mode: "counters" as AppMode, available: true },
+    { icon: Sparkles, labelKey: "hero.feature.coach" as const, mode: null, available: false },
   ];
 
   return (
@@ -35,24 +41,31 @@ const HeroBanner = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-2">
-          {features.map((f) => (
-            <div
-              key={f.labelKey}
-              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                f.available
-                  ? "surface-2 border border-brand/30 text-brand"
-                  : "surface-2 border border-border text-muted-foreground"
-              }`}
-            >
-              <f.icon className="w-3.5 h-3.5 shrink-0" />
-              <span>{t(f.labelKey)}</span>
-              {!f.available && (
-                <span className="ml-auto text-[9px] font-mono uppercase tracking-wider opacity-60">
-                  {t("hero.comingSoon")}
-                </span>
-              )}
-            </div>
-          ))}
+          {features.map((f) => {
+            const isActive = f.available && f.mode === mode;
+            const Tag = f.available ? "button" : "div";
+            return (
+              <Tag
+                key={f.labelKey}
+                onClick={f.available && f.mode ? () => onSelectMode(f.mode as AppMode) : undefined}
+                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors text-left ${
+                  isActive
+                    ? "bg-brand text-primary-foreground border border-brand"
+                    : f.available
+                    ? "surface-2 border border-brand/30 text-brand hover:bg-secondary/50"
+                    : "surface-2 border border-border text-muted-foreground"
+                }`}
+              >
+                <f.icon className="w-3.5 h-3.5 shrink-0" />
+                <span>{t(f.labelKey)}</span>
+                {!f.available && (
+                  <span className="ml-auto text-[9px] font-mono uppercase tracking-wider opacity-60">
+                    {t("hero.comingSoon")}
+                  </span>
+                )}
+              </Tag>
+            );
+          })}
         </div>
       </div>
     </div>

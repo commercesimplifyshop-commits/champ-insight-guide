@@ -109,6 +109,32 @@ const translations = {
   "mistakes.warning": { pt: "ATENÇÃO", en: "WARNING" },
   "mistakes.minor": { pt: "MENOR", en: "MINOR" },
 
+  // Counter Finder
+  "counters.title": { pt: "Counter Finder", en: "Counter Finder" },
+  "counters.subtitle": {
+    pt: "Descubra os melhores counters sugeridos por IA para qualquer campeão e role",
+    en: "Discover the best AI-suggested counters for any champion and role",
+  },
+  "counters.champion": { pt: "Campeão", en: "Champion" },
+  "counters.search": { pt: "Buscar Counters", en: "Find Counters" },
+  "counters.searching": { pt: "Buscando...", en: "Searching..." },
+  "counters.showingFor": { pt: "Counters para", en: "Counters for" },
+  "counters.newSearch": { pt: "Nova Busca", en: "New Search" },
+  "counters.error": { pt: "Erro ao buscar counters", en: "Failed to find counters" },
+  "counters.threat.high": { pt: "AMEAÇA ALTA", en: "HIGH THREAT" },
+  "counters.threat.medium": { pt: "AMEAÇA MÉDIA", en: "MEDIUM THREAT" },
+  "counters.threat.low": { pt: "AMEAÇA BAIXA", en: "LOW THREAT" },
+  "counters.disclaimer": {
+    pt: "Sugestões geradas por IA com base em conhecimento geral do jogo, não em estatísticas de partidas reais.",
+    en: "AI-generated suggestions based on general game knowledge, not real match statistics.",
+  },
+
+  // Footer
+  "footer.disclaimer": {
+    pt: "MATCHUP.GG não é endossado pela Riot Games e não reflete as opiniões da Riot Games ou de qualquer pessoa oficialmente envolvida na produção ou gerenciamento das propriedades da Riot Games.",
+    en: "MATCHUP.GG isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties.",
+  },
+
   // Support / Monetization
   "support.title": { pt: "Apoie o Projeto", en: "Support Us" },
   "support.description": {
