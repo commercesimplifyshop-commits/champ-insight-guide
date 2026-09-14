@@ -30,18 +30,18 @@ const CookieConsentBanner = () => {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 surface-1 border-t border-border shadow-lg">
-      <div className="max-w-3xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center gap-3">
-        <Cookie className="w-5 h-5 text-brand shrink-0 hidden sm:block" />
-        <p className="text-xs text-muted-foreground leading-relaxed flex-1 text-center sm:text-left">
+    <div className="fixed bottom-0 inset-x-0 z-50 surface-2 border-t-2 border-brand/50 shadow-lg">
+      <div className="max-w-3xl mx-auto px-3 sm:px-4 py-2.5 flex items-center gap-2.5">
+        <Cookie className="w-4 h-4 text-brand shrink-0" />
+        <p className="text-[10.5px] sm:text-xs text-foreground/80 leading-snug flex-1">
           {t("cookies.bannerText")}{" "}
-          <Link to="/privacy" className="underline hover:text-foreground transition-colors">
+          <Link to="/privacy" className="underline hover:text-foreground transition-colors whitespace-nowrap">
             {t("cookies.learnMore")}
           </Link>
         </p>
         <button
           onClick={accept}
-          className="shrink-0 px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider bg-brand text-primary-foreground hover:brightness-110 shadow-brand transition-all"
+          className="shrink-0 px-3 py-1.5 sm:px-5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-brand text-primary-foreground hover:brightness-110 shadow-brand transition-all"
         >
           {t("cookies.accept")}
         </button>
