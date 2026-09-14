@@ -14,9 +14,12 @@ const Footer = ({ patch }: FooterProps) => {
         <p className="text-[11px] text-muted-foreground leading-relaxed max-w-2xl mx-auto text-center">
           {t("footer.disclaimer")}
         </p>
-        <p className="text-center">
+        <p className="text-center flex items-center justify-center gap-3">
           <Link to="/contact" className="text-[11px] text-muted-foreground hover:text-foreground underline transition-colors">
             {t("footer.contact")}
+          </Link>
+          <Link to="/privacy" className="text-[11px] text-muted-foreground hover:text-foreground underline transition-colors">
+            {t("footer.privacy")}
           </Link>
         </p>
         {patch && (
