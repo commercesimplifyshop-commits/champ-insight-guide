@@ -283,8 +283,9 @@ const Index = () => {
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
-        {/* Left sidebar — Ad */}
-        <aside className="hidden lg:flex flex-col gap-4 w-[180px] shrink-0 sticky top-20 self-start">
+        {/* Left sidebar — Ad. Same width as the right sidebar so the main
+            content column stays truly centered under the header. */}
+        <aside className="hidden lg:flex flex-col items-center gap-4 w-[320px] shrink-0 sticky top-20 self-start">
           <AdBanner slot="left" />
         </aside>
 
@@ -434,7 +435,7 @@ const Index = () => {
       </main>
 
         {/* Right sidebar — Ad */}
-        <aside className="hidden lg:flex flex-col gap-4 w-[320px] shrink-0 sticky top-20 self-start">
+        <aside className="hidden lg:flex flex-col items-center gap-4 w-[320px] shrink-0 sticky top-20 self-start">
           <AdBanner slot="right" />
         </aside>
       </div>
