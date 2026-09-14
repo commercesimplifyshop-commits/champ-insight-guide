@@ -435,7 +435,7 @@ const Index = () => {
       </main>
 
         {/* Right sidebar — QR Code + Ad */}
-        <aside className="hidden lg:flex flex-col gap-4 w-[200px] shrink-0 sticky top-20 self-start">
+        <aside className="hidden lg:flex flex-col gap-4 w-[320px] shrink-0 sticky top-20 self-start">
           <QrCodeSupport />
           <AdBanner slot="right" />
         </aside>
