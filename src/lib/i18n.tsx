@@ -167,6 +167,22 @@ const translations = {
     en: "Help keep MATCHUP.GG free and without intrusive ads. Every contribution makes a difference!",
   },
   "support.scanMessage": { pt: "Escaneie para contribuir via Pix", en: "Scan to contribute" },
+
+  // Contact / Support
+  "footer.contact": { pt: "Contato / Suporte", en: "Contact / Support" },
+  "contact.title": { pt: "Fale Conosco", en: "Contact Us" },
+  "contact.subtitle": {
+    pt: "Dúvidas, problemas com sua assinatura ou sugestões — mande sua mensagem que respondemos por email.",
+    en: "Questions, subscription issues, or suggestions — send us a message and we'll reply by email.",
+  },
+  "contact.name": { pt: "Nome", en: "Name" },
+  "contact.email": { pt: "Email", en: "Email" },
+  "contact.subject": { pt: "Assunto", en: "Subject" },
+  "contact.subjectPlaceholder": { pt: "Ex: Problema com pagamento", en: "E.g: Billing issue" },
+  "contact.message": { pt: "Mensagem", en: "Message" },
+  "contact.send": { pt: "Enviar Mensagem", en: "Send Message" },
+  "contact.success": { pt: "Mensagem enviada! Vamos responder no email informado.", en: "Message sent! We'll reply to the email you provided." },
+  "contact.error": { pt: "Não foi possível enviar sua mensagem. Tente novamente em instantes.", en: "Couldn't send your message. Please try again shortly." },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

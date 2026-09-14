@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
 
 interface FooterProps {
@@ -12,6 +13,11 @@ const Footer = ({ patch }: FooterProps) => {
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-2">
         <p className="text-[11px] text-muted-foreground leading-relaxed max-w-2xl mx-auto text-center">
           {t("footer.disclaimer")}
+        </p>
+        <p className="text-center">
+          <Link to="/contact" className="text-[11px] text-muted-foreground hover:text-foreground underline transition-colors">
+            {t("footer.contact")}
+          </Link>
         </p>
         {patch && (
           <p className="text-[10px] text-muted-foreground/70 text-center font-mono">
