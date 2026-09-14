@@ -4,6 +4,7 @@ import { Swords, UserCircle2, Crown, ShieldCheck } from "lucide-react";
 import { useI18n, type Locale } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import AuthDialog from "@/components/auth/AuthDialog";
+import DemoModeBanner from "./DemoModeBanner";
 
 const langOptions: { value: Locale; flag: string; label: string }[] = [
   { value: "pt", flag: "🇧🇷", label: "PT" },
@@ -16,7 +17,9 @@ const Header = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   return (
-    <header className="surface-1 border-b border-border sticky top-0 z-40">
+    <>
+      <DemoModeBanner />
+      <header className="surface-1 border-b border-border sticky top-0 z-40">
       <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <Swords className="w-5 h-5 text-brand" />
@@ -98,7 +101,8 @@ const Header = () => {
       </div>
 
       <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
-    </header>
+      </header>
+    </>
   );
 };
 
