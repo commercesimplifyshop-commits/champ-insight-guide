@@ -160,14 +160,6 @@ const translations = {
     en: "MATCHUP.GG isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties.",
   },
 
-  // Support / Monetization
-  "support.title": { pt: "Apoie o Projeto", en: "Support Us" },
-  "support.description": {
-    pt: "Ajude a manter o MATCHUP.GG gratuito e sem anúncios invasivos. Qualquer contribuição faz diferença!",
-    en: "Help keep MATCHUP.GG free and without intrusive ads. Every contribution makes a difference!",
-  },
-  "support.scanMessage": { pt: "Escaneie para contribuir via Pix", en: "Scan to contribute" },
-
   // Contact / Support
   "footer.contact": { pt: "Contato / Suporte", en: "Contact / Support" },
   "contact.title": { pt: "Fale Conosco", en: "Contact Us" },
