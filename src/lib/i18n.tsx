@@ -160,6 +160,12 @@ const translations = {
     en: "MATCHUP.GG isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties.",
   },
 
+  // Demo mode banner
+  "demo.banner": {
+    pt: "MATCHUP.GG está em construção e em modo de demonstração. Assinaturas criadas agora não serão processadas nem mantidas.",
+    en: "MATCHUP.GG is under construction and in demo mode. Subscriptions created now won't be processed or kept.",
+  },
+
   // Contact / Support
   "footer.contact": { pt: "Contato / Suporte", en: "Contact / Support" },
   "contact.title": { pt: "Fale Conosco", en: "Contact Us" },
