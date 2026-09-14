@@ -160,6 +160,14 @@ const translations = {
     en: "MATCHUP.GG isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties.",
   },
 
+  // Cookie consent banner
+  "cookies.bannerText": {
+    pt: "Usamos cookies essenciais, de proteção anti-spam e de publicidade para melhorar sua experiência.",
+    en: "We use essential, anti-spam protection, and advertising cookies to improve your experience.",
+  },
+  "cookies.learnMore": { pt: "Saiba mais", en: "Learn more" },
+  "cookies.accept": { pt: "Aceitar", en: "Accept" },
+
   // Demo mode banner
   "demo.banner": {
     pt: "MATCHUP.GG está em construção e em modo de demonstração. Assinaturas criadas agora não serão processadas nem mantidas.",
@@ -168,6 +176,7 @@ const translations = {
 
   // Contact / Support
   "footer.contact": { pt: "Contato / Suporte", en: "Contact / Support" },
+  "footer.privacy": { pt: "Privacidade e Cookies", en: "Privacy & Cookies" },
   "contact.title": { pt: "Fale Conosco", en: "Contact Us" },
   "contact.subtitle": {
     pt: "Dúvidas, problemas com sua assinatura ou sugestões — mande sua mensagem que respondemos por email.",
