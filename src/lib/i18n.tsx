@@ -162,8 +162,8 @@ const translations = {
 
   // Cookie consent banner
   "cookies.bannerText": {
-    pt: "Usamos cookies essenciais, de proteção anti-spam e de publicidade para melhorar sua experiência.",
-    en: "We use essential, anti-spam protection, and advertising cookies to improve your experience.",
+    pt: "Usamos cookies essenciais, anti-spam e de publicidade.",
+    en: "We use essential, anti-spam, and advertising cookies.",
   },
   "cookies.learnMore": { pt: "Saiba mais", en: "Learn more" },
   "cookies.accept": { pt: "Aceitar", en: "Accept" },
