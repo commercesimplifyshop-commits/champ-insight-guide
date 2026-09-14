@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { I18nProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
-import CookieConsentBanner from "@/components/layout/CookieConsentBanner";
+// import CookieConsentBanner from "@/components/layout/CookieConsentBanner"; // temporarily disabled to isolate a mobile black-screen report
 import Index from "./pages/Index";
 import Account from "./pages/Account";
 import Pricing from "./pages/Pricing";
@@ -23,7 +23,6 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <CookieConsentBanner />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
