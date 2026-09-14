@@ -14,7 +14,6 @@ import ChampionPicker from "@/components/matchup/ChampionPicker";
 import MatchupHeader from "@/components/matchup/MatchupHeader";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
 import JungleAnalysisView from "@/components/matchup/JungleAnalysisView";
-import QrCodeSupport from "@/components/monetization/QrCodeSupport";
 import AdBanner from "@/components/monetization/AdBanner";
 import CounterFinder from "@/components/counterfinder/CounterFinder";
 import TeamAnalysis from "@/components/teamanalysis/TeamAnalysis";
@@ -434,9 +433,8 @@ const Index = () => {
         )}
       </main>
 
-        {/* Right sidebar — QR Code + Ad */}
+        {/* Right sidebar — Ad */}
         <aside className="hidden lg:flex flex-col gap-4 w-[320px] shrink-0 sticky top-20 self-start">
-          <QrCodeSupport />
           <AdBanner slot="right" />
         </aside>
       </div>
