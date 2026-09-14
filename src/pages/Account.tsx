@@ -25,8 +25,9 @@ interface UsageData {
 }
 
 const Account = () => {
-  const { user, loading, isPremium, getAccessToken } = useAuth();
+  const { user, loading, isPremium, getAccessToken, refreshPremiumStatus } = useAuth();
   const [billingLoading, setBillingLoading] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
   const [usage, setUsage] = useState<UsageData | null>(null);
   const [selected, setSelected] = useState<HistoryItem | null>(null);
@@ -52,14 +53,17 @@ const Account = () => {
     const token = getAccessToken();
     if (!token) return;
     setBillingLoading(true);
+    setBillingError(null);
     try {
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Falha ao iniciar assinatura");
       redirectToStripeUrl(data.url);
-    } finally {
+    } catch (err) {
+      setBillingError(err instanceof Error ? err.message : "Falha ao iniciar assinatura");
       setBillingLoading(false);
     }
   };
@@ -68,14 +72,23 @@ const Account = () => {
     const token = getAccessToken();
     if (!token) return;
     setBillingLoading(true);
+    setBillingError(null);
     try {
       const res = await fetch("/api/billing/portal", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+      if (!res.ok) {
+        // The server may have just cleared a stale billing record (e.g. a
+        // leftover Stripe test-mode customer) — refresh so the UI reflects
+        // that this account is no longer marked Premium.
+        await refreshPremiumStatus();
+        throw new Error(data?.error || "Não foi possível abrir o gerenciamento de assinatura");
+      }
       redirectToStripeUrl(data.url);
-    } finally {
+    } catch (err) {
+      setBillingError(err instanceof Error ? err.message : "Não foi possível abrir o gerenciamento de assinatura");
       setBillingLoading(false);
     }
   };
@@ -144,6 +157,10 @@ const Account = () => {
             {isPremium ? "Gerenciar Assinatura" : "Assinar"}
           </button>
         </div>
+
+        {billingError && (
+          <p className="text-xs text-threat -mt-3">{billingError}</p>
+        )}
 
         {usage && usage.total > 0 && (
           <div className="surface-1 border border-border rounded-lg p-4 space-y-3">
