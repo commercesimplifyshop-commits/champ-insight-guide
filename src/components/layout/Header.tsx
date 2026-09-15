@@ -41,7 +41,7 @@ const Header = () => {
             {isAdmin && (
               <Link
                 to="/admin"
-                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-info-status text-primary-foreground hover:brightness-110 transition-all"
+                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[hsl(var(--status-info))] text-primary-foreground hover:brightness-110 transition-all"
               >
                 <ShieldCheck className="w-2.5 h-2.5" />
                 Admin
