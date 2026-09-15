@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, ShieldCheck, CreditCard } from "lucide-react";
+import { Loader2, ShieldCheck, CreditCard, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import Header from "@/components/layout/Header";
 
@@ -7,10 +7,16 @@ type StripeMode = "test" | "live";
 
 const Admin = () => {
   const { user, isAdmin, loading, getAccessToken } = useAuth();
+
   const [stripeMode, setStripeMode] = useState<StripeMode | null>(null);
-  const [modeLoading, setModeLoading] = useState(true);
-  const [savingMode, setSavingMode] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [stripeModeLoading, setStripeModeLoading] = useState(true);
+  const [savingStripeMode, setSavingStripeMode] = useState(false);
+  const [stripeError, setStripeError] = useState<string | null>(null);
+
+  const [demoBanner, setDemoBanner] = useState<boolean | null>(null);
+  const [demoBannerLoading, setDemoBannerLoading] = useState(true);
+  const [savingDemoBanner, setSavingDemoBanner] = useState(false);
+  const [demoBannerError, setDemoBannerError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -20,15 +26,21 @@ const Admin = () => {
     fetch("/api/billing/stripe-mode", { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data) => setStripeMode(data.mode))
-      .catch(() => setError("Não foi possível carregar o modo do Stripe."))
-      .finally(() => setModeLoading(false));
+      .catch(() => setStripeError("Não foi possível carregar o modo do Stripe."))
+      .finally(() => setStripeModeLoading(false));
+
+    fetch("/api/settings/demo-banner", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data) => setDemoBanner(data.enabled))
+      .catch(() => setDemoBannerError("Não foi possível carregar o status do banner."))
+      .finally(() => setDemoBannerLoading(false));
   }, [isAdmin, getAccessToken]);
 
-  const handleModeChange = async (mode: StripeMode) => {
+  const handleStripeModeChange = async (mode: StripeMode) => {
     const token = getAccessToken();
     if (!token || mode === stripeMode) return;
-    setSavingMode(true);
-    setError(null);
+    setSavingStripeMode(true);
+    setStripeError(null);
     try {
       const res = await fetch("/api/billing/stripe-mode", {
         method: "POST",
@@ -39,9 +51,30 @@ const Admin = () => {
       if (!res.ok) throw new Error(data?.error || "Falha ao salvar");
       setStripeMode(data.mode);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Falha ao salvar o modo do Stripe.");
+      setStripeError(err instanceof Error ? err.message : "Falha ao salvar o modo do Stripe.");
     } finally {
-      setSavingMode(false);
+      setSavingStripeMode(false);
+    }
+  };
+
+  const handleDemoBannerChange = async (enabled: boolean) => {
+    const token = getAccessToken();
+    if (!token || enabled === demoBanner) return;
+    setSavingDemoBanner(true);
+    setDemoBannerError(null);
+    try {
+      const res = await fetch("/api/settings/demo-banner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ enabled }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Falha ao salvar");
+      setDemoBanner(data.enabled);
+    } catch (err) {
+      setDemoBannerError(err instanceof Error ? err.message : "Falha ao salvar o banner de demonstração.");
+    } finally {
+      setSavingDemoBanner(false);
     }
   };
 
@@ -85,15 +118,15 @@ const Admin = () => {
             produção (cobra de verdade). Afeta o site inteiro imediatamente, sem precisar de novo deploy.
           </p>
 
-          {modeLoading ? (
+          {stripeModeLoading ? (
             <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
           ) : (
             <div className="flex gap-2">
               {(["test", "live"] as StripeMode[]).map((mode) => (
                 <button
                   key={mode}
-                  onClick={() => handleModeChange(mode)}
-                  disabled={savingMode || stripeMode === mode}
+                  onClick={() => handleStripeModeChange(mode)}
+                  disabled={savingStripeMode || stripeMode === mode}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all disabled:cursor-not-allowed ${
                     stripeMode === mode
                       ? mode === "live"
@@ -102,7 +135,7 @@ const Admin = () => {
                       : "surface-2 text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {savingMode && stripeMode !== mode && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  {savingStripeMode && stripeMode !== mode && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   {mode === "test" ? "Teste" : "Produção"}
                   {stripeMode === mode && " (ativo)"}
                 </button>
@@ -110,7 +143,48 @@ const Admin = () => {
             </div>
           )}
 
-          {error && <p className="text-xs text-threat">{error}</p>}
+          {stripeError && <p className="text-xs text-threat">{stripeError}</p>}
+        </div>
+
+        <div className="surface-1 border border-border rounded-lg p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-caution" />
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
+              Banner de Demonstração
+            </h2>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Controla se o aviso "site em construção / modo de demonstração" aparece acima do cabeçalho em todas as
+            páginas. Desative quando o site estiver pronto para uso oficial.
+          </p>
+
+          {demoBannerLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+          ) : (
+            <div className="flex gap-2">
+              {[
+                { value: true, label: "Ativado" },
+                { value: false, label: "Desativado" },
+              ].map(({ value, label }) => (
+                <button
+                  key={label}
+                  onClick={() => handleDemoBannerChange(value)}
+                  disabled={savingDemoBanner || demoBanner === value}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all disabled:cursor-not-allowed ${
+                    demoBanner === value
+                      ? "bg-brand text-primary-foreground shadow-brand"
+                      : "surface-2 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {savingDemoBanner && demoBanner !== value && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  {label}
+                  {demoBanner === value && " (ativo)"}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {demoBannerError && <p className="text-xs text-threat">{demoBannerError}</p>}
         </div>
       </div>
     </div>

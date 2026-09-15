@@ -1,8 +1,19 @@
+import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 const DemoModeBanner = () => {
   const { t } = useI18n();
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/settings/demo-banner")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => setEnabled(Boolean(data?.enabled)))
+      .catch(() => setEnabled(false));
+  }, []);
+
+  if (!enabled) return null;
 
   return (
     <div className="bg-caution/15 border-b border-caution/40 text-caution">
