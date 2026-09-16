@@ -47,7 +47,7 @@ const TeamRoster = ({
 );
 
 const TeamAnalysisForm = () => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { getAccessToken } = useAuth();
   const [allyPicks, setAllyPicks] = useState<TeamPicks>(emptyTeam());
   const [enemyPicks, setEnemyPicks] = useState<TeamPicks>(emptyTeam());
@@ -71,7 +71,7 @@ const TeamAnalysisForm = () => {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          language: "pt-BR",
+          language: locale === "pt" ? "pt-BR" : "en-US",
           allyTeam: ROLES.map((r) => ({ role: r.value, championId: allyPicks[r.value]!.id })),
           enemyTeam: ROLES.map((r) => ({ role: r.value, championId: enemyPicks[r.value]!.id })),
         }),

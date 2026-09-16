@@ -5,19 +5,32 @@ import { useI18n, type Locale } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import AuthDialog from "@/components/auth/AuthDialog";
 import DemoModeBanner from "./DemoModeBanner";
+import PromoBar from "./PromoBar";
 
 const langOptions: { value: Locale; flag: string; label: string }[] = [
   { value: "pt", flag: "🇧🇷", label: "PT" },
   { value: "en", flag: "🇺🇸", label: "EN" },
 ];
 
-const Header = () => {
+interface HeaderProps {
+  /**
+   * Index.tsx renders its matchup result at the same "/" route as the
+   * selection screen (no route change happens), so <Link to="/"> is a
+   * no-op there and clicking the logo appeared to do nothing. Passing this
+   * lets that page reset its own state when the logo is clicked while
+   * already home.
+   */
+  onLogoClick?: () => void;
+}
+
+const Header = ({ onLogoClick }: HeaderProps) => {
   const { locale, setLocale } = useI18n();
   const { user, isPremium, isAdmin, signOut } = useAuth();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   return (
     <>
+      <PromoBar />
       <DemoModeBanner />
       <header className="surface-1 border-b border-border sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
@@ -25,7 +38,7 @@ const Header = () => {
               single reserved color (info-status) for the Admin badge, which
               doubles as the only entry point to /admin. */}
           <div className="flex items-center gap-2 shrink-0">
-            <Link to="/" className="flex items-center gap-2">
+            <Link to="/" onClick={onLogoClick} className="flex items-center gap-2">
               <Swords className="w-5 h-5 text-brand" />
               <span className="font-bold text-sm tracking-wider text-foreground">
                 MATCHUP<span className="text-brand">.GG</span>
