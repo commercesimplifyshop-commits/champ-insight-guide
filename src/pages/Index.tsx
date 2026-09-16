@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import type { Role, Champion, MatchupPlan } from "@/types/matchup";
+import type { Role, Champion, MatchupPlan, PlayStyle } from "@/types/matchup";
 import { MOCK_PLAN } from "@/data/mock-matchup";
 import { MOCK_JUNGLE_PLAN } from "@/data/mock-jungle-matchup";
 import { useI18n } from "@/lib/i18n";
@@ -10,6 +10,7 @@ import { isAdsenseConfigured, requestRewardedAd } from "@/lib/adsense";
 
 import HeroBanner from "@/components/matchup/HeroBanner";
 import RoleSelector from "@/components/matchup/RoleSelector";
+import PlaystyleSelector from "@/components/matchup/PlaystyleSelector";
 import ChampionPicker from "@/components/matchup/ChampionPicker";
 import MatchupHeader from "@/components/matchup/MatchupHeader";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
@@ -28,6 +29,7 @@ const Index = () => {
   const [role, setRole] = useState<Role | null>(null);
   const [ally, setAlly] = useState<Champion | null>(null);
   const [enemy, setEnemy] = useState<Champion | null>(null);
+  const [playstyle, setPlaystyle] = useState<PlayStyle>("balanced");
   const [loading, setLoading] = useState(false);
   const [adGateLoading, setAdGateLoading] = useState(false);
   const [plan, setPlan] = useState<MatchupPlan | null>(null);
@@ -72,7 +74,8 @@ const Index = () => {
         matchup: {
           role: role,
           yourChampion: { id: ally?.id || ally?.name || '' },
-          enemyChampion: { id: enemy?.id || enemy?.name || '' }
+          enemyChampion: { id: enemy?.id || enemy?.name || '' },
+          playstyle: playstyle
         }
       };
 
@@ -338,6 +341,8 @@ const Index = () => {
                     onClear={() => setEnemy(null)}
                   />
                 </div>
+
+                <PlaystyleSelector selected={playstyle} onSelect={setPlaystyle} />
 
                 <div className="flex justify-center pt-2">
                   <button

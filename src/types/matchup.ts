@@ -3,6 +3,9 @@
 
 export type Role = "top" | "jungle" | "mid" | "adc" | "support";
 
+/** How the player likes to play — tailors the generated plan's advice. */
+export type PlayStyle = "aggressive" | "patient" | "cautious" | "balanced";
+
 export type AdvantageLevel = "strong" | "slight" | "even" | "slight_disadvantage" | "hard";
 
 export interface Champion {
