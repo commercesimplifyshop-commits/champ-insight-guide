@@ -57,12 +57,18 @@ export const loadDisplayAd = (): void => {
 
 export type RewardOutcome = "viewed" | "skipped";
 
+/** Hard ceiling so a rewarded-ad request can never hang the UI forever — if
+ * the account/feature isn't approved yet (or Google's script just never
+ * calls back for any reason), none of adBreak's callbacks fire at all, and
+ * without this the caller's await would wait indefinitely. */
+const REWARD_AD_TIMEOUT_MS = 8000;
+
 /**
  * Gates an action behind a rewarded ad view (Ad Placement API). Resolves
  * with "viewed" only when the user actually watched the ad to completion —
- * every other outcome (dismissed, no ad available, error, or off the
- * production domain) resolves "skipped" so callers can fall back to their
- * own policy (e.g. block the action, or let it through if ads aren't set up).
+ * every other outcome (dismissed, no ad available, error, timeout, or off
+ * the production domain) resolves "skipped" so callers can fall back to
+ * their own policy (e.g. block the action, or let it through).
  */
 export const requestRewardedAd = async (name: string): Promise<RewardOutcome> => {
   if (!isProductionDomain()) return "skipped";
@@ -73,20 +79,28 @@ export const requestRewardedAd = async (name: string): Promise<RewardOutcome> =>
     const settle = (outcome: RewardOutcome) => {
       if (settled) return;
       settled = true;
+      clearTimeout(timer);
       resolve(outcome);
     };
 
-    window.adBreak?.({
-      type: "reward",
-      name,
-      beforeReward: (showAdFn: () => void) => showAdFn(),
-      adViewed: () => settle("viewed"),
-      adDismissed: () => settle("skipped"),
-      // Fallback for any other terminal status (no ad available, error,
-      // timeout, etc.) — adBreakDone always fires exactly once.
-      adBreakDone: (placementInfo?: { breakStatus?: string }) => {
-        if (placementInfo?.breakStatus !== "viewed") settle("skipped");
-      },
-    });
+    const timer = setTimeout(() => settle("skipped"), REWARD_AD_TIMEOUT_MS);
+
+    try {
+      window.adBreak?.({
+        type: "reward",
+        name,
+        beforeReward: (showAdFn: () => void) => showAdFn(),
+        adViewed: () => settle("viewed"),
+        adDismissed: () => settle("skipped"),
+        // Fallback for any other terminal status (no ad available, error,
+        // timeout, etc.) — adBreakDone always fires exactly once.
+        adBreakDone: (placementInfo?: { breakStatus?: string }) => {
+          if (placementInfo?.breakStatus !== "viewed") settle("skipped");
+        },
+      });
+    } catch (err) {
+      console.error("[adsense] adBreak threw", err);
+      settle("skipped");
+    }
   });
 };
