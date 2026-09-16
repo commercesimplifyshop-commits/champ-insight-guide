@@ -420,10 +420,6 @@ const Index = () => {
                     onSelectAlly={handleSelectAlly}
                     onSelectEnemy={setEnemy}
                     soloMode={soloMode}
-                    onToggleSoloMode={(solo) => {
-                      setSoloMode(solo);
-                      if (solo) setEnemy(null);
-                    }}
                   />
                 </div>
 

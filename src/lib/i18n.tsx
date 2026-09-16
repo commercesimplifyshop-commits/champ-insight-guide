@@ -46,8 +46,6 @@ const translations = {
   "confronto.enemy": { pt: "INIMIGO", en: "ENEMY" },
   "confronto.swap": { pt: "trocar ›", en: "change ›" },
   "confronto.pickPlaceholder": { pt: "Escolher campeão", en: "Choose champion" },
-  "confronto.modeVersus": { pt: "Contra um adversário", en: "Against an opponent" },
-  "confronto.modeSolo": { pt: "Modo solo", en: "Solo mode" },
   "role.top": { pt: "Topo", en: "Top" },
   "role.jungle": { pt: "Selva", en: "Jungle" },
   "role.mid": { pt: "Meio", en: "Mid" },
