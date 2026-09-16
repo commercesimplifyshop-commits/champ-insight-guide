@@ -23,7 +23,7 @@ const MistakesList = ({ mistakes }: MistakesListProps) => {
         return (
           <div key={i} className="flex items-start gap-3 surface-2 rounded-md px-3 py-2.5">
             <Icon className={`w-4 h-4 shrink-0 mt-0.5 ${config.textClass}`} />
-            <span className="text-sm text-foreground/80 flex-1">{mistake.text}</span>
+            <span className="text-sm text-foreground/80 flex-1 min-w-0 break-words">{mistake.text}</span>
             <span className={`text-[10px] font-bold uppercase tracking-wider shrink-0 ${config.textClass}`}>
               {t(config.labelKey)}
             </span>
