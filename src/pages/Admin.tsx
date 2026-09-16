@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Loader2, ShieldCheck, CreditCard, AlertTriangle, Gift, Cpu, Flame } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import Header from "@/components/layout/Header";
+import Seo from "@/components/seo/Seo";
 
 type StripeMode = "test" | "live";
 
@@ -228,6 +229,7 @@ const Admin = () => {
   if (!user || !isAdmin) {
     return (
       <div className="min-h-screen bg-background">
+        <Seo title="Admin" description="MATCHUP.GG admin." path="/admin" noindex />
         <Header />
         <div className="flex flex-col items-center justify-center gap-2 px-4 text-center py-20">
           <p className="text-sm text-muted-foreground">
@@ -240,6 +242,7 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo title="Admin" description="MATCHUP.GG admin." path="/admin" noindex />
       <Header />
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
         <div className="flex items-center gap-2">

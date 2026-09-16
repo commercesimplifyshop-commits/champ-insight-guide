@@ -2,6 +2,7 @@ import { MessageCircle } from "lucide-react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { useI18n } from "@/lib/i18n";
+import Seo from "@/components/seo/Seo";
 
 /**
  * Placeholder — the design handoff's Coach IA chat screen needs a new
@@ -13,6 +14,12 @@ const Coach = () => {
 
   return (
     <div className="min-h-screen app-bg flex flex-col">
+      <Seo
+        title="Coach IA"
+        description="Coach de IA do MATCHUP.GG para League of Legends — em desenvolvimento."
+        path="/coach"
+        noindex
+      />
       <Header />
       <div className="flex-1 flex flex-col items-center justify-center gap-3 px-6 text-center">
         <div className="w-12 h-12 rounded-full bg-brand/15 flex items-center justify-center">

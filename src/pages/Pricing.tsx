@@ -8,6 +8,7 @@ import AuthDialog from "@/components/auth/AuthDialog";
 import { redirectToStripeUrl } from "@/lib/stripeRedirect";
 import PromoCountdown from "@/components/monetization/PromoCountdown";
 import PlanComparisonDemo from "@/components/pricing/PlanComparisonDemo";
+import Seo from "@/components/seo/Seo";
 
 interface FeatureRow {
   label: string;
@@ -74,6 +75,11 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <Seo
+        title="Planos e Preços"
+        description="Compare o plano gratuito e o Premium do MATCHUP.GG: análises completas de matchup, counter finder, draft 5v5 e histórico salvo."
+        path="/pricing"
+      />
       <Header />
 
       <main className="flex-1 max-w-3xl mx-auto px-4 py-10 space-y-8 w-full">

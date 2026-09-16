@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth";
 import { getRecaptchaToken } from "@/lib/recaptcha";
 import { isAdsenseConfigured, requestRewardedAd } from "@/lib/adsense";
 import { recommendStyles } from "@/lib/playstyleRecommendation";
+import Seo from "@/components/seo/Seo";
 
 import RoleSelector from "@/components/matchup/RoleSelector";
 import PlaystyleSelector from "@/components/matchup/PlaystyleSelector";
@@ -374,6 +375,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen app-bg">
+      <Seo
+        title="MATCHUP.GG — Estratégias de League of Legends com IA"
+        description="Análises de matchup, counters e estratégia de time para League of Legends geradas por IA. Planos táticos por campeão, role e fase do jogo."
+        path="/"
+      />
       <Header onLogoClick={handleReset} />
       {!plan && <NavStrip items={navItems} />}
 

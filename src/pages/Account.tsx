@@ -6,6 +6,7 @@ import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
 import JungleAnalysisView from "@/components/matchup/JungleAnalysisView";
 import Header from "@/components/layout/Header";
 import { redirectToStripeUrl } from "@/lib/stripeRedirect";
+import Seo from "@/components/seo/Seo";
 
 const Account = () => {
   const { user, loading, isPremium, getAccessToken, refreshPremiumStatus, signOut } = useAuth();
@@ -95,6 +96,7 @@ const Account = () => {
   if (selected) {
     return (
       <div className="min-h-screen app-bg">
+        <Seo title="Minha Conta" description="Sua conta MATCHUP.GG." path="/account" noindex />
         <Header />
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
           <button
@@ -117,6 +119,7 @@ const Account = () => {
 
   return (
     <div className="min-h-screen app-bg">
+      <Seo title="Minha Conta" description="Sua conta MATCHUP.GG." path="/account" noindex />
       <Header />
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-3">
         <div className="flex items-center gap-3.5 mb-2">
