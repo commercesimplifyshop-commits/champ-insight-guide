@@ -1,5 +1,6 @@
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import Seo from "@/components/seo/Seo";
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div className="space-y-2">
@@ -11,6 +12,11 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <Seo
+        title="Política de Privacidade e Cookies"
+        description="Como o MATCHUP.GG coleta, usa e protege seus dados, e nossa política de cookies."
+        path="/privacy"
+      />
       <Header />
 
       <main className="flex-1 max-w-3xl mx-auto px-4 py-10 space-y-6 w-full">
