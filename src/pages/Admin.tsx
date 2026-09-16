@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { Loader2, ShieldCheck, CreditCard, AlertTriangle, Gift } from "lucide-react";
+import { Loader2, ShieldCheck, CreditCard, AlertTriangle, Gift, Cpu } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import Header from "@/components/layout/Header";
 
 type StripeMode = "test" | "live";
+
+const MODEL_PRESETS = ["gpt-4o-mini", "gpt-4o", "gpt-4.1-mini", "gpt-4.1"];
 
 const Admin = () => {
   const { user, isAdmin, loading, getAccessToken } = useAuth();
@@ -22,6 +24,12 @@ const Admin = () => {
   const [rewardAdLoading, setRewardAdLoading] = useState(true);
   const [savingRewardAd, setSavingRewardAd] = useState(false);
   const [rewardAdError, setRewardAdError] = useState<string | null>(null);
+
+  const [freeModel, setFreeModel] = useState("");
+  const [premiumModel, setPremiumModel] = useState("");
+  const [llmModelsLoading, setLlmModelsLoading] = useState(true);
+  const [savingModelTier, setSavingModelTier] = useState<"free" | "premium" | null>(null);
+  const [llmModelsError, setLlmModelsError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -45,6 +53,15 @@ const Admin = () => {
       .then((data) => setRewardAd(data.enabled))
       .catch(() => setRewardAdError("Não foi possível carregar o status do anúncio recompensado."))
       .finally(() => setRewardAdLoading(false));
+
+    fetch("/api/settings/llm-models", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data) => {
+        setFreeModel(data.free ?? "");
+        setPremiumModel(data.premium ?? "");
+      })
+      .catch(() => setLlmModelsError("Não foi possível carregar os modelos de IA."))
+      .finally(() => setLlmModelsLoading(false));
   }, [isAdmin, getAccessToken]);
 
   const handleStripeModeChange = async (mode: StripeMode) => {
@@ -107,6 +124,29 @@ const Admin = () => {
       setRewardAdError(err instanceof Error ? err.message : "Falha ao salvar o anúncio recompensado.");
     } finally {
       setSavingRewardAd(false);
+    }
+  };
+
+  const handleModelChange = async (tier: "free" | "premium", model: string) => {
+    const token = getAccessToken();
+    const trimmed = model.trim();
+    if (!token || !trimmed) return;
+    setSavingModelTier(tier);
+    setLlmModelsError(null);
+    try {
+      const res = await fetch("/api/settings/llm-models", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ [tier]: trimmed }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Falha ao salvar");
+      setFreeModel(data.free ?? "");
+      setPremiumModel(data.premium ?? "");
+    } catch (err) {
+      setLlmModelsError(err instanceof Error ? err.message : "Falha ao salvar o modelo de IA.");
+    } finally {
+      setSavingModelTier(null);
     }
   };
 
@@ -258,6 +298,72 @@ const Admin = () => {
           )}
 
           {rewardAdError && <p className="text-xs text-threat">{rewardAdError}</p>}
+        </div>
+
+        <div className="surface-1 border border-border rounded-lg p-4 space-y-4">
+          <div className="flex items-center gap-2">
+            <Cpu className="w-4 h-4 text-brand" />
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Modelo de IA por Plano</h2>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Controla qual modelo da OpenAI gera as análises para usuários gratuitos e para assinantes Premium.
+            Permite dar ao Premium um modelo mais forte (e mais caro) sem precisar de novo deploy. Modelos com nomes
+            inválidos vão falhar na próxima análise daquele plano — confira o nome exato antes de salvar.
+          </p>
+
+          {llmModelsLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+          ) : (
+            <div className="space-y-4">
+              {(
+                [
+                  { tier: "free" as const, label: "Plano Gratuito", value: freeModel, setValue: setFreeModel },
+                  { tier: "premium" as const, label: "Plano Premium", value: premiumModel, setValue: setPremiumModel },
+                ]
+              ).map(({ tier, label, value, setValue }) => (
+                <div key={tier} className="space-y-2">
+                  <p className="text-xs font-bold text-foreground uppercase tracking-wider">{label}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {MODEL_PRESETS.map((preset) => (
+                      <button
+                        key={preset}
+                        onClick={() => handleModelChange(tier, preset)}
+                        disabled={savingModelTier !== null || value === preset}
+                        className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all disabled:cursor-not-allowed ${
+                          value === preset
+                            ? "bg-brand text-primary-foreground shadow-brand"
+                            : "surface-2 text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {savingModelTier === tier && value !== preset && (
+                          <Loader2 className="inline w-3 h-3 animate-spin mr-1" />
+                        )}
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={value}
+                      onChange={(e) => setValue(e.target.value)}
+                      placeholder="nome customizado do modelo"
+                      className="flex-1 surface-2 border border-border rounded-md px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-brand"
+                    />
+                    <button
+                      onClick={() => handleModelChange(tier, value)}
+                      disabled={savingModelTier !== null || !value.trim()}
+                      className="px-3 py-1.5 rounded-md text-xs font-bold bg-brand text-primary-foreground shadow-brand disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Salvar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {llmModelsError && <p className="text-xs text-threat">{llmModelsError}</p>}
         </div>
       </div>
     </div>
