@@ -2,6 +2,7 @@ import { Route, Swords, Target, Shield, TrendingUp, Clock, Moon, Package, XOctag
 import type { JungleMatchupPlan } from "@/types/matchup";
 import { useI18n } from "@/lib/i18n";
 import QuickOverview from "./QuickOverview";
+import StyleFocusCard from "./StyleFocusCard";
 import CollapsibleSection from "./CollapsibleSection";
 import PhaseCard from "./PhaseCard";
 import PowerSpikesList from "./PowerSpikesList";
@@ -135,6 +136,8 @@ const JungleAnalysisView = ({ plan }: JungleAnalysisViewProps) => {
   return (
     <>
       <QuickOverview overview={plan.overview} />
+
+      {plan.styleFocus && <StyleFocusCard styleFocus={plan.styleFocus} />}
 
       <ChampionAbilities championId={plan.meta.allyChampionId} championName={plan.meta.allyChampion} side="ally" />
       <ChampionAbilities championId={plan.meta.enemyChampionId} championName={plan.meta.enemyChampion} side="enemy" />

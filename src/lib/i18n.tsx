@@ -63,6 +63,11 @@ const translations = {
   "overview.biggestThreat": { pt: "Maior Ameaça", en: "Biggest Threat" },
   "overview.firstFocus": { pt: "Primeiro Foco", en: "First Focus" },
 
+  // Style Focus (concrete, matchup-specific execution of the chosen playstyle + macro style)
+  "styleFocus.title": { pt: "Como Jogar no Seu Estilo", en: "How to Play Your Style" },
+  "styleFocus.keyMoments": { pt: "Momentos-Chave", en: "Key Moments" },
+  "styleFocus.adaptationTip": { pt: "Se Não Estiver Funcionando", en: "If It's Not Working" },
+
   // Lane sections
   "lane.visionJungle": { pt: "Visão & Controle de Jungle", en: "Vision & Jungle Control" },
   "lane.powerSpikes": { pt: "Power Spikes", en: "Power Spikes" },
