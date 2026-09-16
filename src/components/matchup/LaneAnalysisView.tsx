@@ -2,6 +2,7 @@ import { Eye, Map, TrendingUp, Clock, Moon, Package, XOctagon } from "lucide-rea
 import type { LaneMatchupPlan } from "@/types/matchup";
 import { useI18n } from "@/lib/i18n";
 import QuickOverview from "./QuickOverview";
+import StyleFocusCard from "./StyleFocusCard";
 import CollapsibleSection from "./CollapsibleSection";
 import PhaseCard from "./PhaseCard";
 import JungleControlCard from "./JungleControlCard";
@@ -22,6 +23,8 @@ const LaneAnalysisView = ({ plan }: LaneAnalysisViewProps) => {
   return (
     <>
       <QuickOverview overview={plan.overview} />
+
+      {plan.styleFocus && <StyleFocusCard styleFocus={plan.styleFocus} />}
 
       <ChampionAbilities championId={plan.meta.allyChampionId} championName={plan.meta.allyChampion} side="ally" />
       <ChampionAbilities championId={plan.meta.enemyChampionId} championName={plan.meta.enemyChampion} side="enemy" />

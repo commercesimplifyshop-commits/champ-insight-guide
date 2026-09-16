@@ -18,11 +18,20 @@ export interface Champion {
   role: string;
 }
 
+/** Concrete, matchup-specific translation of the player's chosen playstyle + macro style. */
+export interface StyleFocus {
+  summary: string;
+  keyMoments: string[];
+  adaptationTip: string;
+}
+
 /** Lane strategic plan (top, mid, adc, support) */
 export interface LaneMatchupPlan {
   type: "lane";
   meta: MatchupMeta;
   overview: MatchupOverview;
+  // Optional for backward-compat with plans saved before this field existed.
+  styleFocus?: StyleFocus;
   earlyGame: GamePhase;
   powerSpikes: PowerSpike[];
   // Omitted by the backend for non-premium responses (see meta.locked).
@@ -38,6 +47,7 @@ export interface JungleMatchupPlan {
   type: "jungle";
   meta: MatchupMeta;
   overview: MatchupOverview;
+  styleFocus?: StyleFocus;
   clearPath: JungleClearPath;
   powerSpikes: PowerSpike[];
   // Omitted by the backend for non-premium responses (see meta.locked).
