@@ -129,8 +129,12 @@ const ChampionSheet = ({ open, label, selected, onClose, onSelect }: ChampionShe
                 c.tag === "escolhido" ? "bg-brand/10 border-brand/40" : "bg-white/[.035] border-hairline"
               }`}
             >
-              <div className="w-[34px] h-[34px] rounded-[10px] shrink-0 flex items-center justify-center bg-[repeating-linear-gradient(135deg,rgba(255,255,255,.1)_0_5px,rgba(255,255,255,.04)_5px_10px)]">
-                <span className="font-mono font-bold text-[11px] text-ink-70">{initials(c.name)}</span>
+              <div className="w-[34px] h-[34px] rounded-[10px] shrink-0 flex items-center justify-center overflow-hidden bg-[repeating-linear-gradient(135deg,rgba(255,255,255,.1)_0_5px,rgba(255,255,255,.04)_5px_10px)]">
+                {c.image ? (
+                  <img src={c.image} alt={c.name} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="font-mono font-bold text-[11px] text-ink-70">{initials(c.name)}</span>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-semibold text-[14.5px] truncate">{c.name}</div>
