@@ -175,6 +175,15 @@ const translations = {
   "playstyle.patient": { pt: "Paciente", en: "Patient" },
   "playstyle.cautious": { pt: "Cauteloso", en: "Cautious" },
 
+  // Macro style selector (LoL-specific strategic identity)
+  "macrostyle.label": { pt: "Seu modo de jogo", en: "Your macro style" },
+  "macrostyle.split_push": { pt: "Split Push", en: "Split Push" },
+  "macrostyle.poke": { pt: "Poke/Siege", en: "Poke/Siege" },
+  "macrostyle.pick": { pt: "Caçador de Picks", en: "Pick Hunter" },
+  "macrostyle.protect_carry": { pt: "Proteger o Carry", en: "Protect the Carry" },
+  "macrostyle.roamer": { pt: "Roamer", en: "Roamer" },
+  "macrostyle.scaling": { pt: "Scaling", en: "Scaling" },
+
   // Demo mode banner
   "demo.banner": {
     pt: "MATCHUP.GG está em construção e em modo de demonstração. Assinaturas criadas agora não serão processadas nem mantidas.",

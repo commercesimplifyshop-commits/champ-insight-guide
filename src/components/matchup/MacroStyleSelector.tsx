@@ -1,26 +1,28 @@
-import { Swords, Hourglass, Shield } from "lucide-react";
-import type { PlayStyle } from "@/types/matchup";
+import { Route, Zap, Crosshair, Shield, Compass, TrendingUp } from "lucide-react";
+import type { MacroStyle } from "@/types/matchup";
 import { useI18n, type TranslationKey } from "@/lib/i18n";
 
-const styles: { value: PlayStyle; labelKey: TranslationKey; icon: typeof Swords }[] = [
-  { value: "balanced", labelKey: "playstyle.balanced", icon: Shield },
-  { value: "aggressive", labelKey: "playstyle.aggressive", icon: Swords },
-  { value: "patient", labelKey: "playstyle.patient", icon: Hourglass },
-  { value: "cautious", labelKey: "playstyle.cautious", icon: Shield },
+const styles: { value: MacroStyle; labelKey: TranslationKey; icon: typeof Route }[] = [
+  { value: "split_push", labelKey: "macrostyle.split_push", icon: Route },
+  { value: "poke", labelKey: "macrostyle.poke", icon: Zap },
+  { value: "pick", labelKey: "macrostyle.pick", icon: Crosshair },
+  { value: "protect_carry", labelKey: "macrostyle.protect_carry", icon: Shield },
+  { value: "roamer", labelKey: "macrostyle.roamer", icon: Compass },
+  { value: "scaling", labelKey: "macrostyle.scaling", icon: TrendingUp },
 ];
 
-interface PlaystyleSelectorProps {
-  selected: PlayStyle | null;
-  onSelect: (style: PlayStyle) => void;
+interface MacroStyleSelectorProps {
+  selected: MacroStyle | null;
+  onSelect: (style: MacroStyle) => void;
 }
 
-const PlaystyleSelector = ({ selected, onSelect }: PlaystyleSelectorProps) => {
+const MacroStyleSelector = ({ selected, onSelect }: MacroStyleSelectorProps) => {
   const { t } = useI18n();
 
   return (
     <div className="space-y-1.5">
       <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold text-center">
-        {t("playstyle.label")}
+        {t("macrostyle.label")}
       </p>
       <div className="flex items-center justify-center gap-2 flex-wrap">
         {styles.map((s) => (
@@ -42,4 +44,4 @@ const PlaystyleSelector = ({ selected, onSelect }: PlaystyleSelectorProps) => {
   );
 };
 
-export default PlaystyleSelector;
+export default MacroStyleSelector;

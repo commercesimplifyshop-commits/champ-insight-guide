@@ -1,16 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import type { Role, Champion, MatchupPlan, PlayStyle } from "@/types/matchup";
+import type { Role, Champion, MatchupPlan, PlayStyle, MacroStyle } from "@/types/matchup";
 import { MOCK_PLAN } from "@/data/mock-matchup";
 import { MOCK_JUNGLE_PLAN } from "@/data/mock-jungle-matchup";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { getRecaptchaToken } from "@/lib/recaptcha";
 import { isAdsenseConfigured, requestRewardedAd } from "@/lib/adsense";
+import { recommendStyles } from "@/lib/playstyleRecommendation";
 
 import HeroBanner from "@/components/matchup/HeroBanner";
 import RoleSelector from "@/components/matchup/RoleSelector";
 import PlaystyleSelector from "@/components/matchup/PlaystyleSelector";
+import MacroStyleSelector from "@/components/matchup/MacroStyleSelector";
 import ChampionPicker from "@/components/matchup/ChampionPicker";
 import MatchupHeader from "@/components/matchup/MatchupHeader";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
@@ -29,7 +31,8 @@ const Index = () => {
   const [role, setRole] = useState<Role | null>(null);
   const [ally, setAlly] = useState<Champion | null>(null);
   const [enemy, setEnemy] = useState<Champion | null>(null);
-  const [playstyle, setPlaystyle] = useState<PlayStyle>("balanced");
+  const [playstyle, setPlaystyle] = useState<PlayStyle | null>(null);
+  const [macroStyle, setMacroStyle] = useState<MacroStyle | null>(null);
   const [loading, setLoading] = useState(false);
   const [adGateLoading, setAdGateLoading] = useState(false);
   const [plan, setPlan] = useState<MatchupPlan | null>(null);
@@ -47,7 +50,31 @@ const Index = () => {
   const [debugJson, setDebugJson] = useState("");
   const isDebug = import.meta.env.VITE_APP_DEBUG === "true";
 
-  const canAnalyze = role && ally && enemy;
+  const canAnalyze = role && ally && enemy && playstyle && macroStyle;
+
+  const handleSelectAlly = (champion: Champion | null) => {
+    setAlly(champion);
+    if (champion) {
+      const recommended = recommendStyles(role, champion.role);
+      setPlaystyle(recommended.temperament);
+      setMacroStyle(recommended.macroStyle);
+    } else {
+      setPlaystyle(null);
+      setMacroStyle(null);
+    }
+  };
+
+  const handleSelectRole = (newRole: Role) => {
+    setRole(newRole);
+    // Role affects the recommendation (e.g. jungle/support override champion
+    // class) — recompute if a champion is already picked instead of leaving
+    // a stale suggestion from the previous role.
+    if (ally) {
+      const recommended = recommendStyles(newRole, ally.role);
+      setPlaystyle(recommended.temperament);
+      setMacroStyle(recommended.macroStyle);
+    }
+  };
 
   const showNotice = (msg: string) => {
     setNotice(msg);
@@ -75,7 +102,8 @@ const Index = () => {
           role: role,
           yourChampion: { id: ally?.id || ally?.name || '' },
           enemyChampion: { id: enemy?.id || enemy?.name || '' },
-          playstyle: playstyle
+          playstyle: playstyle,
+          macroStyle: macroStyle
         }
       };
 
@@ -278,6 +306,8 @@ const Index = () => {
     setRole(null);
     setAlly(null);
     setEnemy(null);
+    setPlaystyle(null);
+    setMacroStyle(null);
     setPlan(null);
   };
 
@@ -322,7 +352,7 @@ const Index = () => {
                 </div>
 
                 <div className="flex justify-center">
-                  <RoleSelector selected={role} onSelect={setRole} />
+                  <RoleSelector selected={role} onSelect={handleSelectRole} />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -330,8 +360,8 @@ const Index = () => {
                     label={t("selection.yourChampion")}
                     side="ally"
                     selected={ally}
-                    onSelect={setAlly}
-                    onClear={() => setAlly(null)}
+                    onSelect={handleSelectAlly}
+                    onClear={() => handleSelectAlly(null)}
                   />
                   <ChampionPicker
                     label={t("selection.enemyChampion")}
@@ -343,6 +373,7 @@ const Index = () => {
                 </div>
 
                 <PlaystyleSelector selected={playstyle} onSelect={setPlaystyle} />
+                <MacroStyleSelector selected={macroStyle} onSelect={setMacroStyle} />
 
                 <div className="flex justify-center pt-2">
                   <button
