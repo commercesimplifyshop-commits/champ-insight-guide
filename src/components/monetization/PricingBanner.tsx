@@ -17,7 +17,8 @@ const PricingBanner = () => {
         <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand" />
       </div>
       <p className="flex-1 min-w-0 truncate text-[11px] sm:text-xs text-foreground/90">
-        <span className="font-bold text-brand">MATCHUP.GG Premium</span> — Conheça nossos planos
+        <span className="font-bold text-brand">MATCHUP.GG Premium</span> — Conheça nossos planos a partir de{" "}
+        <span className="font-bold text-foreground">R$19,90/mês</span>
       </p>
       <Link
         to="/pricing"
