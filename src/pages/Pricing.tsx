@@ -153,7 +153,7 @@ const Pricing = () => {
           <div className="text-center space-y-1">
             <h2 className="text-lg font-extrabold text-foreground">Veja a diferença na prática</h2>
             <p className="text-xs text-muted-foreground">
-              Mesmo confronto, resultado gratuito vs. Premium — alterna automaticamente a cada 8s ou clique para comparar.
+              Mesmo confronto, resultado gratuito vs. Premium — alterna automaticamente ou clique para comparar.
             </p>
           </div>
           <PlanComparisonDemo />
