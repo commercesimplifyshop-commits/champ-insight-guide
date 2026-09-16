@@ -347,12 +347,29 @@ const Index = () => {
     setPlan(null);
   };
 
+  // Perfil isn't listed here — the header's avatar already links to /account
+  // once logged in, so a second entry point would be redundant.
   const navItems: NavStripItem[] = [
-    { key: "matchup", label: t("nav.matchup"), active: mode === "matchup", onClick: () => setMode("matchup") },
+    {
+      key: "matchup",
+      label: t("nav.matchup"),
+      active: mode === "matchup" && !soloMode,
+      onClick: () => {
+        setMode("matchup");
+        setSoloMode(false);
+      },
+    },
+    {
+      key: "solo",
+      label: t("nav.soloShort"),
+      active: mode === "matchup" && soloMode,
+      onClick: () => {
+        setMode("matchup");
+        setSoloMode(true);
+      },
+    },
     { key: "draft", label: t("nav.draft"), active: mode === "team", onClick: () => setMode("team") },
     { key: "coach", label: t("nav.coach"), badge: "PRO", active: false, to: "/coach" },
-    // Only shown once logged in — otherwise it just leads to a "please log in" page.
-    ...(user ? [{ key: "perfil", label: t("nav.profile"), active: false, to: "/account" }] : []),
   ];
 
   return (
