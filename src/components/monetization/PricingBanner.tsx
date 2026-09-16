@@ -3,12 +3,13 @@ import { Crown, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import AuthDialog from "@/components/auth/AuthDialog";
 import { redirectToStripeUrl } from "@/lib/stripeRedirect";
+import PromoCountdown from "./PromoCountdown";
 import type { AppMode } from "@/pages/Index";
 
 const COPY: Record<AppMode, string> = {
-  matchup: "Desbloqueie a análise completa do 1v1 — mid/late game, itemização e erros a evitar",
-  counters: "Desbloqueie o Counter Finder ilimitado",
-  team: "Desbloqueie a Análise 5v5 completa — estratégia de time gerada por IA",
+  matchup: "Desbloqueie a análise completa do 1v1 (mid/late game, itemização e erros a evitar) com um modelo de IA mais avançado",
+  counters: "Desbloqueie o Counter Finder ilimitado com um modelo de IA mais avançado",
+  team: "Desbloqueie a Análise 5v5 completa — estratégia de time gerada por um modelo de IA mais avançado",
 };
 
 interface PricingBannerProps {
@@ -53,10 +54,13 @@ const PricingBanner = ({ mode }: PricingBannerProps) => {
         <div className="w-8 h-8 rounded-full bg-brand/20 flex items-center justify-center shrink-0">
           <Crown className="w-4 h-4 text-brand" />
         </div>
-        <p className="text-xs text-foreground/90 leading-snug">
-          <span className="font-bold text-brand">MATCHUP.GG Premium</span> — {COPY[mode]} por{" "}
-          <span className="font-bold text-foreground">R$19,90/mês</span>
-        </p>
+        <div className="space-y-1">
+          <p className="text-xs text-foreground/90 leading-snug">
+            <span className="font-bold text-brand">MATCHUP.GG Premium</span> — {COPY[mode]} por{" "}
+            <span className="font-bold text-foreground">R$19,90/mês</span>
+          </p>
+          <PromoCountdown />
+        </div>
       </div>
       <button
         onClick={handleClick}

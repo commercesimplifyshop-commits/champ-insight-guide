@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
-import { Loader2, ShieldCheck, CreditCard, AlertTriangle, Gift, Cpu } from "lucide-react";
+import { Loader2, ShieldCheck, CreditCard, AlertTriangle, Gift, Cpu, Flame } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import Header from "@/components/layout/Header";
 
 type StripeMode = "test" | "live";
 
 const MODEL_PRESETS = ["gpt-4o-mini", "gpt-4o", "gpt-4.1-mini", "gpt-4.1"];
+
+/** Converts an ISO datetime to the value <input type="datetime-local"> expects (local time, no timezone/seconds). */
+const toDatetimeLocalValue = (iso: string): string => {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
 
 const Admin = () => {
   const { user, isAdmin, loading, getAccessToken } = useAuth();
@@ -30,6 +38,12 @@ const Admin = () => {
   const [llmModelsLoading, setLlmModelsLoading] = useState(true);
   const [savingModelTier, setSavingModelTier] = useState<"free" | "premium" | null>(null);
   const [llmModelsError, setLlmModelsError] = useState<string | null>(null);
+
+  const [promoDeadline, setPromoDeadline] = useState<string | null>(null);
+  const [promoInput, setPromoInput] = useState("");
+  const [promoLoading, setPromoLoading] = useState(true);
+  const [savingPromo, setSavingPromo] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -62,6 +76,15 @@ const Admin = () => {
       })
       .catch(() => setLlmModelsError("Não foi possível carregar os modelos de IA."))
       .finally(() => setLlmModelsLoading(false));
+
+    fetch("/api/settings/promo", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data: { deadline: string | null }) => {
+        setPromoDeadline(data.deadline);
+        setPromoInput(data.deadline ? toDatetimeLocalValue(data.deadline) : "");
+      })
+      .catch(() => setPromoError("Não foi possível carregar o prazo da promoção."))
+      .finally(() => setPromoLoading(false));
   }, [isAdmin, getAccessToken]);
 
   const handleStripeModeChange = async (mode: StripeMode) => {
@@ -147,6 +170,50 @@ const Admin = () => {
       setLlmModelsError(err instanceof Error ? err.message : "Falha ao salvar o modelo de IA.");
     } finally {
       setSavingModelTier(null);
+    }
+  };
+
+  const handlePromoSave = async () => {
+    const token = getAccessToken();
+    if (!token || !promoInput) return;
+    setSavingPromo(true);
+    setPromoError(null);
+    try {
+      const iso = new Date(promoInput).toISOString();
+      const res = await fetch("/api/settings/promo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ deadline: iso }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Falha ao salvar");
+      setPromoDeadline(data.deadline);
+    } catch (err) {
+      setPromoError(err instanceof Error ? err.message : "Falha ao salvar o prazo da promoção.");
+    } finally {
+      setSavingPromo(false);
+    }
+  };
+
+  const handlePromoClear = async () => {
+    const token = getAccessToken();
+    if (!token) return;
+    setSavingPromo(true);
+    setPromoError(null);
+    try {
+      const res = await fetch("/api/settings/promo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ deadline: null }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Falha ao salvar");
+      setPromoDeadline(data.deadline);
+      setPromoInput("");
+    } catch (err) {
+      setPromoError(err instanceof Error ? err.message : "Falha ao encerrar a promoção.");
+    } finally {
+      setSavingPromo(false);
     }
   };
 
@@ -364,6 +431,60 @@ const Admin = () => {
           )}
 
           {llmModelsError && <p className="text-xs text-threat">{llmModelsError}</p>}
+        </div>
+
+        <div className="surface-1 border border-border rounded-lg p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Flame className="w-4 h-4 text-threat" />
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">
+              Cronômetro de Promoção
+            </h2>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Define um prazo real para o cronômetro exibido na página de planos e no banner de assinatura, criando
+            urgência para o preço atual (R$19,90). É um prazo verdadeiro, não um contador infinito: ao expirar, o
+            cronômetro some sozinho em vez de reiniciar — defina um novo prazo aqui quando quiser rodar outra
+            rodada de promoção.
+          </p>
+
+          {promoLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+          ) : (
+            <div className="space-y-2">
+              {promoDeadline && (
+                <p className="text-xs text-foreground/80">
+                  Ativo até <span className="font-bold">{new Date(promoDeadline).toLocaleString("pt-BR")}</span>
+                </p>
+              )}
+              <div className="flex flex-wrap gap-2">
+                <input
+                  type="datetime-local"
+                  value={promoInput}
+                  onChange={(e) => setPromoInput(e.target.value)}
+                  className="surface-2 border border-border rounded-md px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-brand"
+                />
+                <button
+                  onClick={handlePromoSave}
+                  disabled={savingPromo || !promoInput}
+                  className="px-3 py-1.5 rounded-md text-xs font-bold bg-brand text-primary-foreground shadow-brand disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {savingPromo && <Loader2 className="inline w-3 h-3 animate-spin mr-1" />}
+                  Salvar prazo
+                </button>
+                {promoDeadline && (
+                  <button
+                    onClick={handlePromoClear}
+                    disabled={savingPromo}
+                    className="px-3 py-1.5 rounded-md text-xs font-bold surface-2 text-muted-foreground hover:text-foreground disabled:cursor-not-allowed"
+                  >
+                    Encerrar promoção
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {promoError && <p className="text-xs text-threat">{promoError}</p>}
         </div>
       </div>
     </div>

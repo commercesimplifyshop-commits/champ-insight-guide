@@ -5,6 +5,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import AuthDialog from "@/components/auth/AuthDialog";
 import { redirectToStripeUrl } from "@/lib/stripeRedirect";
+import PromoCountdown from "@/components/monetization/PromoCountdown";
 
 interface FeatureRow {
   label: string;
@@ -15,6 +16,7 @@ interface FeatureRow {
 const FEATURES: FeatureRow[] = [
   { label: "Matchup 1v1 — overview, early game e power spikes", free: true, pro: true },
   { label: "Matchup 1v1 — mid/late game, itemização e erros a evitar", free: false, pro: true },
+  { label: "Análises com IA mais avançada — mais detalhadas e aprofundadas", free: false, pro: true },
   { label: "Counter Finder (sugestões de IA)", free: false, pro: true },
   { label: "Análise 5v5 (composição de time completa)", free: false, pro: true },
   { label: "Histórico de análises salvo", free: false, pro: true },
@@ -90,9 +92,11 @@ const Pricing = () => {
               <p className="text-2xl font-extrabold text-foreground mt-1">
                 R$19,90<span className="text-sm font-medium text-muted-foreground">/mês</span>
               </p>
+              <PromoCountdown className="mt-1.5" />
             </div>
             <p className="text-xs text-foreground/80 leading-relaxed">
-              Análise completa (1v1, 5v5, Counter Finder), histórico salvo e estatísticas de uso.
+              Análise completa (1v1, 5v5, Counter Finder) com um modelo de IA mais avançado — respostas mais
+              detalhadas e aprofundadas —, histórico salvo e estatísticas de uso.
             </p>
             <button
               onClick={handleSubscribe}
