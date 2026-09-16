@@ -90,15 +90,18 @@ export interface MatchupMeta {
   allyChampion: string;
   allyChampionId: string;
   allyImage: string;
-  enemyChampion: string;
-  enemyChampionId: string;
-  enemyImage: string;
+  /** Absent for solo plans (no opponent) — see `isSolo`. */
+  enemyChampion?: string;
+  enemyChampionId?: string;
+  enemyImage?: string;
   role: Role;
   difficulty: AdvantageLevel;
   winRate: string;
   patch: string;
   /** true when the deeper sections below were omitted by the backend (free preview). */
   locked?: boolean;
+  /** true when generated without a specific enemy champion — a general strategy guide, not a head-to-head matchup. */
+  isSolo?: boolean;
 }
 
 /** The DOMINANT first-glance section */

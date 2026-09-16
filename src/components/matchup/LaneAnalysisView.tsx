@@ -178,7 +178,9 @@ const LaneAnalysisView = ({ plan }: LaneAnalysisViewProps) => {
   return (
     <>
       <ChampionAbilities championId={plan.meta.allyChampionId} championName={plan.meta.allyChampion} side="ally" />
-      <ChampionAbilities championId={plan.meta.enemyChampionId} championName={plan.meta.enemyChampion} side="enemy" />
+      {plan.meta.enemyChampionId && plan.meta.enemyChampion && (
+        <ChampionAbilities championId={plan.meta.enemyChampionId} championName={plan.meta.enemyChampion} side="enemy" />
+      )}
 
       <ResultTabs tabs={tabs} />
 

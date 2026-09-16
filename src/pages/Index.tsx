@@ -39,6 +39,7 @@ const Index = () => {
   const [role, setRole] = useState<Role | null>(null);
   const [ally, setAlly] = useState<Champion | null>(null);
   const [enemy, setEnemy] = useState<Champion | null>(null);
+  const [soloMode, setSoloMode] = useState(false);
   const [playstyle, setPlaystyle] = useState<PlayStyle | null>(null);
   const [macroStyle, setMacroStyle] = useState<MacroStyle | null>(null);
   const [loading, setLoading] = useState(false);
@@ -82,7 +83,7 @@ const Index = () => {
   const [debugJson, setDebugJson] = useState("");
   const isDebug = import.meta.env.VITE_APP_DEBUG === "true";
 
-  const canAnalyze = role && ally && enemy && playstyle && macroStyle;
+  const canAnalyze = role && ally && (soloMode || enemy) && playstyle && macroStyle;
 
   const handleSelectAlly = (champion: Champion | null) => {
     setAlly(champion);
@@ -127,13 +128,15 @@ const Index = () => {
       // yet (see src/lib/recaptcha.ts) so this never blocks the flow locally.
       const recaptchaToken = await getRecaptchaToken('analyze_matchup');
 
-      // Send minimal payload: only language and matchup (role + champion ids)
+      // Send minimal payload: only language and matchup (role + champion ids).
+      // enemyChampion is omitted entirely in solo mode — the backend treats
+      // its absence as "no opponent" and generates a general strategy guide.
       const prompt = {
         metadata: { language: locale === 'pt' ? 'pt-BR' : 'en-US' },
         matchup: {
           role: role,
           yourChampion: { id: ally?.id || ally?.name || '' },
-          enemyChampion: { id: enemy?.id || enemy?.name || '' },
+          ...(soloMode ? {} : { enemyChampion: { id: enemy?.id || enemy?.name || '' } }),
           playstyle: playstyle,
           macroStyle: macroStyle
         }
@@ -338,6 +341,7 @@ const Index = () => {
     setRole(null);
     setAlly(null);
     setEnemy(null);
+    setSoloMode(false);
     setPlaystyle(null);
     setMacroStyle(null);
     setPlan(null);
@@ -397,6 +401,11 @@ const Index = () => {
                     enemy={enemy}
                     onSelectAlly={handleSelectAlly}
                     onSelectEnemy={setEnemy}
+                    soloMode={soloMode}
+                    onToggleSoloMode={(solo) => {
+                      setSoloMode(solo);
+                      if (solo) setEnemy(null);
+                    }}
                   />
                 </div>
 
@@ -539,13 +548,15 @@ const Index = () => {
                               <div className="w-8 h-8 rounded-[9px] overflow-hidden border border-white/10">
                                 {meta?.allyImage && <img src={meta.allyImage} alt={r.ally_champion_name} className="w-full h-full object-cover" />}
                               </div>
-                              <div className="w-8 h-8 rounded-[9px] overflow-hidden -ml-2.5 border-2" style={{ borderColor: "#111316" }}>
-                                {meta?.enemyImage && <img src={meta.enemyImage} alt={r.enemy_champion_name} className="w-full h-full object-cover" />}
-                              </div>
+                              {r.enemy_champion_name && (
+                                <div className="w-8 h-8 rounded-[9px] overflow-hidden -ml-2.5 border-2" style={{ borderColor: "#111316" }}>
+                                  {meta?.enemyImage && <img src={meta.enemyImage} alt={r.enemy_champion_name} className="w-full h-full object-cover" />}
+                                </div>
+                              )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="font-semibold text-sm truncate">
-                                {r.ally_champion_name} vs {r.enemy_champion_name}
+                                {r.enemy_champion_name ? `${r.ally_champion_name} vs ${r.enemy_champion_name}` : r.ally_champion_name}
                               </div>
                               <div className="font-mono text-[11px] text-ink-40 mt-0.5">{r.role}</div>
                             </div>

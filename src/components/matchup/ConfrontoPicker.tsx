@@ -8,6 +8,8 @@ interface ConfrontoPickerProps {
   enemy: Champion | null;
   onSelectAlly: (champion: Champion) => void;
   onSelectEnemy: (champion: Champion) => void;
+  soloMode: boolean;
+  onToggleSoloMode: (solo: boolean) => void;
 }
 
 const initials = (name: string) =>
@@ -66,19 +68,43 @@ const ConfrontoRow = ({
   );
 };
 
-const ConfrontoPicker = ({ ally, enemy, onSelectAlly, onSelectEnemy }: ConfrontoPickerProps) => {
+const ConfrontoPicker = ({ ally, enemy, onSelectAlly, onSelectEnemy, soloMode, onToggleSoloMode }: ConfrontoPickerProps) => {
   const { t } = useI18n();
   const [pickerFor, setPickerFor] = useState<"ally" | "enemy" | null>(null);
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <ConfrontoRow champion={ally} side="ally" onClick={() => setPickerFor("ally")} />
-      <div className="flex items-center gap-2 px-0.5">
-        <span className="flex-1 h-px bg-hairline" />
-        <span className="font-mono font-bold text-[9.5px] tracking-[1px] text-ink-40">VS</span>
-        <span className="flex-1 h-px bg-hairline" />
+    <div className="flex flex-col gap-2.5">
+      <div className="flex gap-[7px]">
+        <button
+          onClick={() => onToggleSoloMode(false)}
+          className={`flex-1 py-2 rounded-full text-xs font-medium border transition-colors ${
+            !soloMode ? "bg-brand/[.14] text-brand border-brand/[.35]" : "glass text-ink-50 border-hairline"
+          }`}
+        >
+          {t("confronto.modeVersus")}
+        </button>
+        <button
+          onClick={() => onToggleSoloMode(true)}
+          className={`flex-1 py-2 rounded-full text-xs font-medium border transition-colors ${
+            soloMode ? "bg-brand/[.14] text-brand border-brand/[.35]" : "glass text-ink-50 border-hairline"
+          }`}
+        >
+          {t("confronto.modeSolo")}
+        </button>
       </div>
-      <ConfrontoRow champion={enemy} side="enemy" onClick={() => setPickerFor("enemy")} />
+
+      <ConfrontoRow champion={ally} side="ally" onClick={() => setPickerFor("ally")} />
+
+      {!soloMode && (
+        <>
+          <div className="flex items-center gap-2 px-0.5">
+            <span className="flex-1 h-px bg-hairline" />
+            <span className="font-mono font-bold text-[9.5px] tracking-[1px] text-ink-40">VS</span>
+            <span className="flex-1 h-px bg-hairline" />
+          </div>
+          <ConfrontoRow champion={enemy} side="enemy" onClick={() => setPickerFor("enemy")} />
+        </>
+      )}
 
       <ChampionSheet
         open={pickerFor === "ally"}
