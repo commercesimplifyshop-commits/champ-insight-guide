@@ -1,16 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Swords, UserCircle2, Crown, ShieldCheck } from "lucide-react";
-import { useI18n, type Locale } from "@/lib/i18n";
+import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import AuthDialog from "@/components/auth/AuthDialog";
 import DemoModeBanner from "./DemoModeBanner";
 import PromoBar from "./PromoBar";
-
-const langOptions: { value: Locale; flag: string; label: string }[] = [
-  { value: "pt", flag: "🇧🇷", label: "PT" },
-  { value: "en", flag: "🇺🇸", label: "EN" },
-];
+import NavDrawer from "./NavDrawer";
 
 interface HeaderProps {
   /**
@@ -24,89 +19,79 @@ interface HeaderProps {
 }
 
 const Header = ({ onLogoClick }: HeaderProps) => {
-  const { locale, setLocale } = useI18n();
-  const { user, isPremium, isAdmin, signOut } = useAuth();
+  const { t } = useI18n();
+  const { user, isPremium, isAdmin } = useAuth();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const initials = (user?.email || "?").slice(0, 2).toUpperCase();
 
   return (
     <>
       <PromoBar />
       <DemoModeBanner />
-      <header className="surface-1 border-b border-border sticky top-0 z-40">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          {/* Logo + status badges — brand color for the wordmark/Premium, a
-              single reserved color (info-status) for the Admin badge, which
-              doubles as the only entry point to /admin. */}
-          <div className="flex items-center gap-2 shrink-0">
-            <Link to="/" onClick={onLogoClick} className="flex items-center gap-2">
-              <Swords className="w-5 h-5 text-brand" />
-              <span className="font-bold text-sm tracking-wider text-foreground">
-                MATCHUP<span className="text-brand">.GG</span>
-              </span>
-            </Link>
+      <header
+        className="sticky top-0 z-40 flex items-center gap-2.5 px-3.5 py-[11px] border-b border-hairline"
+        style={{ background: "rgba(12,13,17,.72)", backdropFilter: "blur(24px)" }}
+      >
+        <button
+          onClick={() => setMenuOpen(true)}
+          aria-label={t("nav.openMenu")}
+          className="shrink-0 w-[34px] h-[34px] rounded-[10px] border border-white/10 flex flex-col items-center justify-center gap-1"
+        >
+          <span className="w-[15px] h-[1.5px] bg-[rgba(244,245,243,.85)]" />
+          <span className="w-[15px] h-[1.5px] bg-[rgba(244,245,243,.85)]" />
+          <span className="w-[9px] h-[1.5px] self-start ml-[9.5px]" style={{ background: "rgba(245,178,26,.9)" }} />
+        </button>
 
+        <Link to="/" onClick={onLogoClick} className="flex items-baseline gap-1 mr-auto">
+          <span className="font-bold text-[17px] tracking-[-.4px]">MATCHUP</span>
+          <span className="font-bold text-[17px] font-mono text-brand">.GG</span>
+        </Link>
+
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className="hidden sm:flex items-center text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[hsl(var(--status-info))] text-primary-foreground"
+          >
+            Admin
+          </Link>
+        )}
+
+        {user ? (
+          <div className="flex items-center gap-2">
             {isPremium && (
-              <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-brand text-primary-foreground">
-                <Crown className="w-2.5 h-2.5" />
-                Premium
+              <span className="flex items-center gap-1.5 py-1.5 px-2.5 rounded-full border" style={{ borderColor: "rgba(245,178,26,.28)", background: "rgba(245,178,26,.07)" }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse-dot" />
+                <span className="font-mono text-[10px] text-brand">PRO</span>
               </span>
             )}
-            {isAdmin && (
-              <Link
-                to="/admin"
-                className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[hsl(var(--status-info))] text-primary-foreground hover:brightness-110 transition-all"
-              >
-                <ShieldCheck className="w-2.5 h-2.5" />
-                Admin
-              </Link>
-            )}
-          </div>
-
-          {/* Right side — neutral text links, one accent color reserved for
-              the primary CTA / selected state only. */}
-          <div className="flex items-center gap-4 text-xs font-semibold text-muted-foreground">
-            <Link to="/pricing" className="hover:text-foreground transition-colors hidden sm:inline">
-              Planos
+            <Link
+              to="/account"
+              className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center shrink-0"
+              style={{ background: "repeating-linear-gradient(135deg,rgba(255,255,255,.1) 0 5px,rgba(255,255,255,.04) 5px 10px)" }}
+            >
+              <span className="font-mono font-bold text-[10px] text-ink-70">{initials}</span>
             </Link>
-
-            <div className="flex items-center gap-0.5 surface-2 rounded-md p-0.5">
-              {langOptions.map((lang) => (
-                <button
-                  key={lang.value}
-                  onClick={() => setLocale(lang.value)}
-                  className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold transition-colors ${
-                    locale === lang.value ? "bg-brand text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <span>{lang.flag}</span>
-                  <span>{lang.label}</span>
-                </button>
-              ))}
-            </div>
-
-            {user ? (
-              <div className="flex items-center gap-3">
-                <Link to="/account" className="flex items-center gap-1.5 hover:text-foreground transition-colors">
-                  <UserCircle2 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Minha Conta</span>
-                </Link>
-                <button onClick={signOut} className="hover:text-foreground transition-colors">
-                  Sair
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setAuthDialogOpen(true)}
-                className="uppercase tracking-wider px-3 py-1.5 rounded-md bg-brand text-primary-foreground hover:brightness-110 transition-all"
-              >
-                Entrar
-              </button>
-            )}
           </div>
-        </div>
-
-        <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
+        ) : (
+          <div className="flex items-center gap-2">
+            <button onClick={() => setAuthDialogOpen(true)} className="text-[13px] font-medium text-ink-70 px-1">
+              {t("nav.signIn")}
+            </button>
+            <Link
+              to="/pricing"
+              className="font-bold text-[13px] px-3.5 py-2 rounded-full shadow-brand"
+              style={{ color: "var(--on-accent)", background: "linear-gradient(180deg,#FFC94A,#F5B21A)" }}
+            >
+              {t("nav.subscribe")}
+            </Link>
+          </div>
+        )}
       </header>
+
+      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} onOpenAuth={() => setAuthDialogOpen(true)} />
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </>
   );
 };

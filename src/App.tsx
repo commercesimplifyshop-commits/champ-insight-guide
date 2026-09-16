@@ -7,6 +7,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
 import CookieConsentBanner from "@/components/layout/CookieConsentBanner";
 import Index from "./pages/Index";
+import Coach from "./pages/Coach";
 import Account from "./pages/Account";
 import Pricing from "./pages/Pricing";
 import Admin from "./pages/Admin";
@@ -27,6 +28,7 @@ const App = () => (
             <CookieConsentBanner />
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/coach" element={<Coach />} />
               <Route path="/account" element={<Account />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/admin" element={<Admin />} />

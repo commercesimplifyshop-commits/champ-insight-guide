@@ -1,16 +1,17 @@
 import type { Role } from "@/types/matchup";
+import { useI18n, type TranslationKey } from "@/lib/i18n";
 import topIcon from "@/assets/roles/top.png";
 import jungleIcon from "@/assets/roles/jungle.png";
 import midIcon from "@/assets/roles/mid.png";
 import adcIcon from "@/assets/roles/adc.png";
 import supportIcon from "@/assets/roles/support.png";
 
-const roles: { value: Role; label: string; icon: string }[] = [
-  { value: "top", label: "Top", icon: topIcon },
-  { value: "jungle", label: "Jungle", icon: jungleIcon },
-  { value: "mid", label: "Mid", icon: midIcon },
-  { value: "adc", label: "ADC", icon: adcIcon },
-  { value: "support", label: "Support", icon: supportIcon },
+const roles: { value: Role; labelKey: TranslationKey; icon: string }[] = [
+  { value: "top", labelKey: "role.top", icon: topIcon },
+  { value: "jungle", labelKey: "role.jungle", icon: jungleIcon },
+  { value: "mid", labelKey: "role.mid", icon: midIcon },
+  { value: "adc", labelKey: "role.adc", icon: adcIcon },
+  { value: "support", labelKey: "role.support", icon: supportIcon },
 ];
 
 interface RoleSelectorProps {
@@ -19,28 +20,30 @@ interface RoleSelectorProps {
 }
 
 const RoleSelector = ({ selected, onSelect }: RoleSelectorProps) => {
+  const { t } = useI18n();
+
   return (
-    <div className="flex items-center gap-2">
-      {roles.map((r) => (
-        <button
-          key={r.value}
-          onClick={() => onSelect(r.value)}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold uppercase tracking-wider transition-colors ${
-            selected === r.value
-              ? "bg-brand text-primary-foreground"
-              : "surface-2 text-muted-foreground hover:text-foreground hover:bg-secondary"
-          }`}
-        >
-          <img
-            src={r.icon}
-            alt={r.label}
-            className={`w-4 h-4 object-contain ${
-              selected === r.value ? "brightness-0 invert" : "brightness-0 invert opacity-60"
+    <div className="flex items-center gap-[7px] overflow-x-auto no-scrollbar pb-0.5">
+      {roles.map((r) => {
+        const active = selected === r.value;
+        return (
+          <button
+            key={r.value}
+            onClick={() => onSelect(r.value)}
+            className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-medium transition-colors border ${
+              active ? "bg-brand/[.14] text-brand border-brand/[.35]" : "glass text-ink-50 border-hairline"
             }`}
-          />
-          <span className="hidden sm:inline">{r.label}</span>
-        </button>
-      ))}
+          >
+            <img
+              src={r.icon}
+              alt={t(r.labelKey)}
+              className={`w-4 h-4 object-contain ${active ? "" : "opacity-60"}`}
+              style={active ? { filter: "sepia(1) saturate(6) hue-rotate(-10deg) brightness(1.15)" } : undefined}
+            />
+            {t(r.labelKey)}
+          </button>
+        );
+      })}
     </div>
   );
 };
