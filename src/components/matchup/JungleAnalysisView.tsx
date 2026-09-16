@@ -1,130 +1,28 @@
-import { Route, Swords, Target, Shield, TrendingUp, Clock, Moon, Package, XOctagon } from "lucide-react";
+import { Link } from "react-router-dom";
 import type { JungleMatchupPlan } from "@/types/matchup";
-import { useI18n } from "@/lib/i18n";
-import QuickOverview from "./QuickOverview";
-import StyleFocusCard from "./StyleFocusCard";
-import CollapsibleSection from "./CollapsibleSection";
-import PhaseCard from "./PhaseCard";
-import PowerSpikesList from "./PowerSpikesList";
-import ItemBuild from "./ItemBuild";
-import MistakesList from "./MistakesList";
-import PremiumGate from "./PremiumGate";
+import { useI18n, type TranslationKey } from "@/lib/i18n";
 import ChampionAbilities from "./ChampionAbilities";
+import ContentBlock from "./ContentBlock";
+import ResultTabs, { type ResultTabDef } from "./ResultTabs";
+import PowerSpikesList from "./PowerSpikesList";
+import PremiumGate from "./PremiumGate";
 
 interface JungleAnalysisViewProps {
   plan: JungleMatchupPlan;
 }
 
-const ClearPathCard = ({ data }: { data: JungleMatchupPlan["clearPath"] }) => {
-  const { t } = useI18n();
-  return (
-    <div className="space-y-3">
-      <div className="surface-2 rounded-md px-3 py-2">
-        <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">{t("jungle.recommendedStart")}</p>
-        <p className="text-sm text-foreground/90">{data.recommendedStart}</p>
-      </div>
-      <div className="surface-2 rounded-md px-3 py-2">
-        <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">{t("jungle.firstBack")}</p>
-        <p className="text-sm text-foreground/90">{data.firstBackTiming}</p>
-      </div>
-      <div>
-        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t("jungle.fullRoute")}</p>
-        <ol className="space-y-1.5">
-          {data.fullClearRoute.map((step, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm">
-              <span className="text-brand font-bold text-xs mt-0.5 shrink-0 w-4 text-center">{i + 1}</span>
-              <span className="text-foreground/80">{step}</span>
-            </li>
-          ))}
-        </ol>
-      </div>
-    </div>
-  );
-};
+const GOLD = "text-brand border-brand/30";
+const NEUTRAL = "text-ink-70 border-white/10";
+const DANGER = "text-threat border-threat/30";
+const WARN = "text-[#FFC44D] border-[#FFC44D]/30";
+const CRITICAL = "text-threat border-threat/30";
+const WARNING = "text-[#FFC44D] border-[#FFC44D]/30";
+const MINOR = "text-ink-40 border-white/10";
 
-const GankingCard = ({ data }: { data: JungleMatchupPlan["gankingStrategy"] }) => {
-  const { t } = useI18n();
-  return (
-    <div className="space-y-3">
-      <div className="surface-2 rounded-md px-3 py-2">
-        <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">{t("jungle.priority")}</p>
-        <p className="text-sm text-foreground/90">{data.priority}</p>
-      </div>
-      <div>
-        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{t("jungle.bestTimings")}</p>
-        <ul className="space-y-1.5">
-          {data.bestTimings.map((ti, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm">
-              <span className="text-caution mt-0.5 shrink-0">⏱</span>
-              <span className="text-foreground/80">{ti}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <ul className="space-y-2">
-        {data.bullets.map((b, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm">
-            <span className="text-brand mt-0.5 shrink-0">▸</span>
-            <span className="text-foreground/80">{b}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-const ObjectiveCard = ({ data }: { data: JungleMatchupPlan["objectiveControl"] }) => {
-  const { t } = useI18n();
-  return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        <div className="surface-2 rounded-md px-3 py-2">
-          <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">{t("jungle.dragon")}</p>
-          <p className="text-xs text-foreground/80">{data.dragonPriority}</p>
-        </div>
-        <div className="surface-2 rounded-md px-3 py-2">
-          <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">{t("jungle.herald")}</p>
-          <p className="text-xs text-foreground/80">{data.heraldStrategy}</p>
-        </div>
-      </div>
-      <ul className="space-y-2">
-        {data.bullets.map((b, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm">
-            <span className="text-brand mt-0.5 shrink-0">▸</span>
-            <span className="text-foreground/80">{b}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-const CounterJungleCard = ({ data }: { data: JungleMatchupPlan["counterJungling"] }) => {
-  const { t } = useI18n();
-  const riskColors = { low: "text-positive", medium: "text-caution", high: "text-threat" };
-  const riskLabelKeys = { low: "jungle.riskLow" as const, medium: "jungle.riskMedium" as const, high: "jungle.riskHigh" as const };
-  return (
-    <div className="space-y-3">
-      <div className="surface-2 rounded-md px-3 py-2 flex items-center gap-2">
-        <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t("jungle.risk")}:</p>
-        <span className={`text-xs font-bold uppercase ${riskColors[data.riskLevel]}`}>
-          {t(riskLabelKeys[data.riskLevel])}
-        </span>
-      </div>
-      <div className="surface-2 rounded-md px-3 py-2">
-        <p className="text-xs font-bold text-brand uppercase tracking-wider mb-1">{t("jungle.strategy")}</p>
-        <p className="text-sm text-foreground/90">{data.strategy}</p>
-      </div>
-      <ul className="space-y-2">
-        {data.bullets.map((b, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm">
-            <span className="text-brand mt-0.5 shrink-0">▸</span>
-            <span className="text-foreground/80">{b}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+const riskLabelKeys: Record<string, TranslationKey> = {
+  low: "jungle.riskLow",
+  medium: "jungle.riskMedium",
+  high: "jungle.riskHigh",
 };
 
 const JungleAnalysisView = ({ plan }: JungleAnalysisViewProps) => {
@@ -133,111 +31,184 @@ const JungleAnalysisView = ({ plan }: JungleAnalysisViewProps) => {
   const hasFullData =
     !locked && plan.gankingStrategy && plan.objectiveControl && plan.counterJungling && plan.midGame && plan.lateGame && plan.itemization && plan.mistakes;
 
+  const resumoTab = (
+    <>
+      {plan.styleFocus && (
+        <ContentBlock tag={t("matchup.you")} tagColorClass="text-brand" tagBorderClass="border-brand/30">
+          {plan.styleFocus.summary}
+        </ContentBlock>
+      )}
+      <ContentBlock tag="01" tagColorClass={NEUTRAL.split(" ")[0]} tagBorderClass={NEUTRAL.split(" ")[1]}>
+        {plan.overview.biggestThreat}
+      </ContentBlock>
+      <ContentBlock tag="02" tagColorClass={NEUTRAL.split(" ")[0]} tagBorderClass={NEUTRAL.split(" ")[1]}>
+        {plan.overview.firstDecisionFocus}
+      </ContentBlock>
+      <ContentBlock tag="03" tagColorClass={NEUTRAL.split(" ")[0]} tagBorderClass={NEUTRAL.split(" ")[1]}>
+        {plan.overview.earlyAdvantage.summary}
+      </ContentBlock>
+      {plan.styleFocus && plan.styleFocus.keyMoments.length > 0 && (
+        <ContentBlock tag={t("styleFocus.keyMoments")} tagColorClass="text-[#FFC44D]" tagBorderClass="border-[#FFC44D]/30">
+          <ul className="space-y-1.5">
+            {plan.styleFocus.keyMoments.map((m, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="text-brand mt-0.5 shrink-0">▸</span>
+                <span>{m}</span>
+              </li>
+            ))}
+          </ul>
+        </ContentBlock>
+      )}
+      {plan.powerSpikes.length > 0 && (
+        <div className="pt-1">
+          <p className="font-mono text-[10px] tracking-[.9px] text-ink-40 uppercase mb-2">{t("lane.powerSpikes")}</p>
+          <PowerSpikesList spikes={plan.powerSpikes} />
+        </div>
+      )}
+    </>
+  );
+
+  const fasesTab = (
+    <>
+      <ContentBlock tag="0-6" tagColorClass={DANGER.split(" ")[0]} tagBorderClass={DANGER.split(" ")[1]} heading={t("jungle.clearPath")}>
+        <p className="mb-1">
+          <b className="text-brand">{t("jungle.recommendedStart")}:</b> {plan.clearPath.recommendedStart}
+        </p>
+        <p className="mb-2">
+          <b className="text-brand">{t("jungle.firstBack")}:</b> {plan.clearPath.firstBackTiming}
+        </p>
+        <ol className="space-y-1.5">
+          {plan.clearPath.fullClearRoute.map((step, i) => (
+            <li key={i} className="flex items-start gap-2">
+              <span className="text-brand font-bold shrink-0">{i + 1}.</span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+      </ContentBlock>
+
+      {hasFullData ? (
+        <>
+          <ContentBlock tag="6-20" tagColorClass={WARN.split(" ")[0]} tagBorderClass={WARN.split(" ")[1]} heading={t("jungle.gankingStrategy")}>
+            <p className="mb-2">
+              <b className="text-brand">{t("jungle.priority")}:</b> {plan.gankingStrategy!.priority}
+            </p>
+            <ul className="space-y-1.5">
+              {plan.gankingStrategy!.bullets.map((b, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-brand mt-0.5 shrink-0">▸</span>
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </ContentBlock>
+          <ContentBlock tag="20+" tagColorClass={GOLD.split(" ")[0]} tagBorderClass={GOLD.split(" ")[1]} heading={t("jungle.objectiveControl")}>
+            <p className="mb-1">
+              <b className="text-brand">{t("jungle.dragon")}:</b> {plan.objectiveControl!.dragonPriority}
+            </p>
+            <p className="mb-2">
+              <b className="text-brand">{t("jungle.herald")}:</b> {plan.objectiveControl!.heraldStrategy}
+            </p>
+            <ul className="space-y-1.5">
+              {plan.objectiveControl!.bullets.map((b, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-brand mt-0.5 shrink-0">▸</span>
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </ContentBlock>
+          <ContentBlock
+            tag={t(riskLabelKeys[plan.counterJungling!.riskLevel])}
+            tagColorClass={NEUTRAL.split(" ")[0]}
+            tagBorderClass={NEUTRAL.split(" ")[1]}
+            heading={t("jungle.counterJungling")}
+          >
+            <p className="mb-2">{plan.counterJungling!.strategy}</p>
+            <ul className="space-y-1.5">
+              {plan.counterJungling!.bullets.map((b, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-brand mt-0.5 shrink-0">▸</span>
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </ContentBlock>
+        </>
+      ) : (
+        <PremiumGate sectionTitles={[t("jungle.gankingStrategy"), t("jungle.objectiveControl"), t("jungle.counterJungling")]} />
+      )}
+    </>
+  );
+
+  const buildTab = hasFullData ? (
+    <>
+      {plan.itemization!.coreBuild.map((item, i) => (
+        <ContentBlock key={i} tag={`${t("items.coreBuild")} ${i + 1}`} tagColorClass={GOLD.split(" ")[0]} tagBorderClass={GOLD.split(" ")[1]} heading={item.name}>
+          {item.reason}
+        </ContentBlock>
+      ))}
+      {plan.itemization!.situational.length > 0 && (
+        <ContentBlock tag={t("items.situational")} tagColorClass={WARN.split(" ")[0]} tagBorderClass={WARN.split(" ")[1]}>
+          <ul className="space-y-1.5">
+            {plan.itemization!.situational.map((item, i) => (
+              <li key={i}>
+                <b className="text-foreground">{item.name}</b> — {item.reason}
+              </li>
+            ))}
+          </ul>
+        </ContentBlock>
+      )}
+      <ContentBlock tag={t("items.runes")} tagColorClass={NEUTRAL.split(" ")[0]} tagBorderClass={NEUTRAL.split(" ")[1]}>
+        {plan.itemization!.runeNote}
+      </ContentBlock>
+    </>
+  ) : (
+    <PremiumGate sectionTitles={[t("lane.itemization")]} />
+  );
+
+  const errosTab = hasFullData ? (
+    <>
+      {plan.mistakes!.map((m, i) => {
+        const style = m.severity === "critical" ? CRITICAL : m.severity === "warning" ? WARNING : MINOR;
+        return (
+          <ContentBlock
+            key={i}
+            tag={t(`mistakes.${m.severity}`)}
+            tagColorClass={style.split(" ")[0]}
+            tagBorderClass={style.split(" ")[1]}
+          >
+            {m.text}
+          </ContentBlock>
+        );
+      })}
+    </>
+  ) : (
+    <PremiumGate sectionTitles={[t("jungle.mistakes")]} />
+  );
+
+  const tabs: ResultTabDef[] = [
+    { key: "resumo", label: t("result.tab.summary"), content: resumoTab },
+    { key: "fases", label: t("result.tab.phases"), content: fasesTab },
+    { key: "build", label: t("result.tab.build"), content: buildTab },
+    { key: "erros", label: t("result.tab.mistakes"), content: errosTab },
+  ];
+
   return (
     <>
-      <QuickOverview overview={plan.overview} />
-
-      {plan.styleFocus && <StyleFocusCard styleFocus={plan.styleFocus} />}
-
       <ChampionAbilities championId={plan.meta.allyChampionId} championName={plan.meta.allyChampion} side="ally" />
       <ChampionAbilities championId={plan.meta.enemyChampionId} championName={plan.meta.enemyChampion} side="enemy" />
 
-      <CollapsibleSection
-        title={t("jungle.clearPath")}
-        icon={<Route className="w-4 h-4" />}
-        iconColorClass="text-brand"
-        defaultOpen={true}
+      <ResultTabs tabs={tabs} />
+
+      <Link
+        to="/coach"
+        className="flex items-center justify-between rounded-2xl border border-dashed px-4 py-[15px]"
+        style={{ borderColor: "rgba(245,178,26,.35)" }}
       >
-        <ClearPathCard data={plan.clearPath} />
-      </CollapsibleSection>
-
-      <CollapsibleSection
-        title={t("lane.powerSpikes")}
-        icon={<TrendingUp className="w-4 h-4" />}
-        iconColorClass="text-caution"
-        defaultOpen={true}
-      >
-        <PowerSpikesList spikes={plan.powerSpikes} />
-      </CollapsibleSection>
-
-      {!hasFullData ? (
-        <PremiumGate
-          sectionTitles={[
-            t("jungle.gankingStrategy"),
-            t("jungle.objectiveControl"),
-            t("jungle.counterJungling"),
-            t("phase.midGame"),
-            t("phase.lateGame"),
-            t("lane.itemization"),
-            t("jungle.mistakes"),
-          ]}
-        />
-      ) : (
-      <>
-        <CollapsibleSection
-          title={t("jungle.gankingStrategy")}
-          icon={<Swords className="w-4 h-4" />}
-          iconColorClass="text-caution"
-          defaultOpen={true}
-        >
-          <GankingCard data={plan.gankingStrategy} />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          title={t("jungle.objectiveControl")}
-          icon={<Target className="w-4 h-4" />}
-          iconColorClass="text-info-status"
-          defaultOpen={true}
-        >
-          <ObjectiveCard data={plan.objectiveControl} />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          title={t("jungle.counterJungling")}
-          icon={<Shield className="w-4 h-4" />}
-          iconColorClass="text-threat"
-          defaultOpen={true}
-        >
-          <CounterJungleCard data={plan.counterJungling} />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          title={plan.midGame.title}
-          icon={<Clock className="w-4 h-4" />}
-          iconColorClass="text-brand"
-          defaultOpen={true}
-        >
-          <PhaseCard phase={plan.midGame} />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          title={plan.lateGame.title}
-          icon={<Moon className="w-4 h-4" />}
-          iconColorClass="text-info-status"
-          defaultOpen={true}
-        >
-          <PhaseCard phase={plan.lateGame} />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          title={t("lane.itemization")}
-          icon={<Package className="w-4 h-4" />}
-          iconColorClass="text-brand"
-          defaultOpen={true}
-        >
-          <ItemBuild itemization={plan.itemization} />
-        </CollapsibleSection>
-
-        <CollapsibleSection
-          title={t("jungle.mistakes")}
-          icon={<XOctagon className="w-4 h-4" />}
-          iconColorClass="text-threat"
-          defaultOpen={true}
-        >
-          <MistakesList mistakes={plan.mistakes} />
-        </CollapsibleSection>
-      </>
-      )}
+        <span className="text-brand text-[13.5px] font-medium">{t("result.askCoach")}</span>
+        <span className="font-mono font-bold text-brand">→</span>
+      </Link>
     </>
   );
 };

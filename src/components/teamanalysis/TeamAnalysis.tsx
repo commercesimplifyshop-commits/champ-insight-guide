@@ -1,13 +1,17 @@
 import { useState } from "react";
-import { Loader2, Users, Swords, Target, Clock, Moon, ShieldAlert } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import type { Role, Champion } from "@/types/matchup";
 import type { TeamAnalysisPlan } from "@/types/team-analysis";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import FeatureGate from "@/components/shared/FeatureGate";
 import ChampionPicker from "@/components/matchup/ChampionPicker";
-import CollapsibleSection from "@/components/matchup/CollapsibleSection";
-import PhaseCard from "@/components/matchup/PhaseCard";
+import ContentBlock from "@/components/matchup/ContentBlock";
+
+const GOLD = "text-brand border-brand/30";
+const NEUTRAL = "text-ink-70 border-white/10";
+const DANGER = "text-threat border-threat/30";
+const WARN = "text-[#FFC44D] border-[#FFC44D]/30";
 
 const ROLES: { value: Role; label: string }[] = [
   { value: "top", label: "Top" },
@@ -97,94 +101,102 @@ const TeamAnalysisForm = () => {
 
   if (result) {
     return (
-      <div className="space-y-4">
-        <div className="surface-1 border border-border rounded-lg p-4 space-y-3">
+      <div className="space-y-2.5">
+        <div className="glass rounded-2xl border border-white/[.07] p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-[10px] text-muted-foreground font-mono">Patch {result.patch}</p>
-            <button onClick={handleReset} className="text-xs text-muted-foreground hover:text-foreground transition-colors font-medium">
+            <p className="text-[10px] text-ink-40 font-mono">Patch {result.patch}</p>
+            <button onClick={handleReset} className="text-xs text-ink-40 hover:text-ink-70 transition-colors font-medium">
               Nova Análise
             </button>
           </div>
           <div className="grid grid-cols-5 gap-1.5">
             {result.allyTeam.map((s) => (
               <div key={s.role} className="flex flex-col items-center gap-1">
-                {s.championImage && <img src={s.championImage} alt={s.championName} className="w-9 h-9 rounded-md border-2 border-info-status" />}
-                <span className="text-[9px] text-muted-foreground uppercase">{s.role}</span>
+                {s.championImage && <img src={s.championImage} alt={s.championName} className="w-9 h-9 rounded-[9px] border border-brand/30" />}
+                <span className="text-[9px] text-ink-40 uppercase">{s.role}</span>
               </div>
             ))}
           </div>
-          <p className="text-center text-xs font-mono text-muted-foreground">VS</p>
+          <p className="text-center text-xs font-mono text-ink-40">VS</p>
           <div className="grid grid-cols-5 gap-1.5">
             {result.enemyTeam.map((s) => (
               <div key={s.role} className="flex flex-col items-center gap-1">
-                {s.championImage && <img src={s.championImage} alt={s.championName} className="w-9 h-9 rounded-md border-2 border-threat" />}
-                <span className="text-[9px] text-muted-foreground uppercase">{s.role}</span>
+                {s.championImage && <img src={s.championImage} alt={s.championName} className="w-9 h-9 rounded-[9px] border border-threat/30" />}
+                <span className="text-[9px] text-ink-40 uppercase">{s.role}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="surface-1 border border-border rounded-lg p-4 space-y-2">
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-brand" />
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">{result.identity.compType}</h3>
-          </div>
-          <p className="text-xs text-foreground/80 leading-relaxed">{result.identity.summary}</p>
-          <div className="surface-2 rounded-md px-3 py-2">
-            <p className="text-[10px] font-bold text-brand uppercase tracking-wider mb-1">Condição de Vitória</p>
-            <p className="text-xs text-foreground/90">{result.identity.winCondition}</p>
-          </div>
-        </div>
+        <ContentBlock tag={t("team.identity")} tagColorClass={GOLD.split(" ")[0]} tagBorderClass={GOLD.split(" ")[1]} heading={result.identity.compType}>
+          <p className="mb-2">{result.identity.summary}</p>
+          <p>
+            <b className="text-brand">{t("team.winCondition")}:</b> {result.identity.winCondition}
+          </p>
+        </ContentBlock>
 
-        <CollapsibleSection title="Ameaças Principais" icon={<ShieldAlert className="w-4 h-4" />} iconColorClass="text-threat" defaultOpen>
-          <div className="space-y-2">
-            {result.keyThreats.map((k, i) => (
-              <div key={i} className="surface-2 rounded-md px-3 py-2">
-                <p className="text-xs font-bold text-threat">{k.championName}</p>
-                <p className="text-xs text-foreground/80">{k.reason}</p>
-              </div>
+        {result.keyThreats.map((k, i) => (
+          <ContentBlock key={i} tag={t("team.threat")} tagColorClass={DANGER.split(" ")[0]} tagBorderClass={DANGER.split(" ")[1]} heading={k.championName}>
+            {k.reason}
+          </ContentBlock>
+        ))}
+
+        <ContentBlock tag="0-6" tagColorClass={DANGER.split(" ")[0]} tagBorderClass={DANGER.split(" ")[1]} heading={result.earlyGame.title}>
+          <p className="mb-2">{result.earlyGame.objective}</p>
+          <ul className="space-y-1.5">
+            {result.earlyGame.bullets.map((b, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="text-brand mt-0.5 shrink-0">▸</span>
+                <span>{b}</span>
+              </li>
             ))}
-          </div>
-        </CollapsibleSection>
+          </ul>
+        </ContentBlock>
+        <ContentBlock tag="6-20" tagColorClass={WARN.split(" ")[0]} tagBorderClass={WARN.split(" ")[1]} heading={result.midGame.title}>
+          <p className="mb-2">{result.midGame.objective}</p>
+          <ul className="space-y-1.5">
+            {result.midGame.bullets.map((b, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="text-brand mt-0.5 shrink-0">▸</span>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        </ContentBlock>
+        <ContentBlock tag="20+" tagColorClass={GOLD.split(" ")[0]} tagBorderClass={GOLD.split(" ")[1]} heading={result.lateGame.title}>
+          <p className="mb-2">{result.lateGame.objective}</p>
+          <ul className="space-y-1.5">
+            {result.lateGame.bullets.map((b, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="text-brand mt-0.5 shrink-0">▸</span>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        </ContentBlock>
 
-        <CollapsibleSection title={result.earlyGame.title} icon={<Swords className="w-4 h-4" />} iconColorClass="text-brand" defaultOpen>
-          <PhaseCard phase={result.earlyGame} />
-        </CollapsibleSection>
-        <CollapsibleSection title={result.midGame.title} icon={<Clock className="w-4 h-4" />} iconColorClass="text-brand">
-          <PhaseCard phase={result.midGame} />
-        </CollapsibleSection>
-        <CollapsibleSection title={result.lateGame.title} icon={<Moon className="w-4 h-4" />} iconColorClass="text-info-status">
-          <PhaseCard phase={result.lateGame} />
-        </CollapsibleSection>
-
-        <CollapsibleSection title="Prioridade de Objetivos" icon={<Target className="w-4 h-4" />} iconColorClass="text-caution">
+        <ContentBlock tag={t("team.objectives")} tagColorClass={NEUTRAL.split(" ")[0]} tagBorderClass={NEUTRAL.split(" ")[1]}>
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="surface-2 rounded-md p-2">
-              <p className="text-[10px] text-muted-foreground uppercase mb-1">Dragão</p>
+              <p className="text-[10px] text-ink-40 uppercase mb-1">{t("jungle.dragon")}</p>
               <p className="text-xs font-semibold text-foreground">{result.objectivePriority.dragon}</p>
             </div>
             <div className="surface-2 rounded-md p-2">
-              <p className="text-[10px] text-muted-foreground uppercase mb-1">Barão</p>
+              <p className="text-[10px] text-ink-40 uppercase mb-1">{t("team.baron")}</p>
               <p className="text-xs font-semibold text-foreground">{result.objectivePriority.baron}</p>
             </div>
             <div className="surface-2 rounded-md p-2">
-              <p className="text-[10px] text-muted-foreground uppercase mb-1">Arauto</p>
+              <p className="text-[10px] text-ink-40 uppercase mb-1">{t("jungle.herald")}</p>
               <p className="text-xs font-semibold text-foreground">{result.objectivePriority.herald}</p>
             </div>
           </div>
-        </CollapsibleSection>
+        </ContentBlock>
 
-        <div className="surface-1 border border-border rounded-lg p-4 space-y-2">
-          <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Foco por Jogador</h3>
-          {result.teammateCallouts.map((c, i) => (
-            <div key={i} className="flex items-start gap-2 surface-2 rounded-md px-3 py-2">
-              <span className="text-[9px] font-bold text-brand uppercase tracking-wider w-14 shrink-0 pt-0.5">{c.role}</span>
-              <p className="text-xs text-foreground/80">
-                <span className="font-semibold text-foreground">{c.championName}:</span> {c.advice}
-              </p>
-            </div>
-          ))}
-        </div>
+        {result.teammateCallouts.map((c, i) => (
+          <ContentBlock key={i} tag={c.role.toUpperCase()} tagColorClass={NEUTRAL.split(" ")[0]} tagBorderClass={NEUTRAL.split(" ")[1]} heading={c.championName}>
+            {c.advice}
+          </ContentBlock>
+        ))}
       </div>
     );
   }
