@@ -61,6 +61,7 @@ const translations = {
   "form.step4HintPrefix": { pt: "o papel do", en: "the role of" },
   "form.step4HintSuffix": { pt: "no seu time", en: "on your team" },
   "nav.matchup": { pt: "Análise de matchup", en: "Matchup analysis" },
+  "nav.solo": { pt: "Plano solo (sem adversário)", en: "Solo plan (no opponent)" },
   "nav.draft": { pt: "Draft 5v5", en: "5v5 draft" },
   "nav.coach": { pt: "Coach IA", en: "AI Coach" },
   "nav.counters": { pt: "Counters por campeão", en: "Champion counters" },
