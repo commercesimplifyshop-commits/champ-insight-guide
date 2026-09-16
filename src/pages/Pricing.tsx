@@ -14,9 +14,9 @@ interface FeatureRow {
 }
 
 const FEATURES: FeatureRow[] = [
+  { label: "Resultado mais avançado", free: false, pro: true },
   { label: "Matchup 1v1 — overview, early game e power spikes", free: true, pro: true },
   { label: "Matchup 1v1 — mid/late game, itemização e erros a evitar", free: false, pro: true },
-  { label: "Análises com IA mais avançada — mais detalhadas e aprofundadas", free: false, pro: true },
   { label: "Counter Finder (sugestões de IA)", free: false, pro: true },
   { label: "Análise 5v5 (composição de time completa)", free: false, pro: true },
   { label: "Histórico de análises salvo", free: false, pro: true },
