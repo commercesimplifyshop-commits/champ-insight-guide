@@ -39,7 +39,7 @@ const Index = () => {
   const [role, setRole] = useState<Role | null>(null);
   const [ally, setAlly] = useState<Champion | null>(null);
   const [enemy, setEnemy] = useState<Champion | null>(null);
-  const [soloMode, setSoloMode] = useState(false);
+  const [soloMode, setSoloMode] = useState(searchParams.get("solo") === "1");
   const [playstyle, setPlaystyle] = useState<PlayStyle | null>(null);
   const [macroStyle, setMacroStyle] = useState<MacroStyle | null>(null);
   const [loading, setLoading] = useState(false);
@@ -351,7 +351,8 @@ const Index = () => {
     { key: "matchup", label: t("nav.matchup"), active: mode === "matchup", onClick: () => setMode("matchup") },
     { key: "draft", label: t("nav.draft"), active: mode === "team", onClick: () => setMode("team") },
     { key: "coach", label: t("nav.coach"), badge: "PRO", active: false, to: "/coach" },
-    { key: "perfil", label: t("nav.profile"), active: false, to: "/account" },
+    // Only shown once logged in — otherwise it just leads to a "please log in" page.
+    ...(user ? [{ key: "perfil", label: t("nav.profile"), active: false, to: "/account" }] : []),
   ];
 
   return (
