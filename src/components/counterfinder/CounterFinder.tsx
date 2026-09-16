@@ -15,7 +15,7 @@ const threatStyles: Record<CounterFinderResult["counters"][number]["threat"], st
 };
 
 const CounterFinderForm = () => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { getAccessToken } = useAuth();
   const [role, setRole] = useState<Role | null>(null);
   const [champion, setChampion] = useState<Champion | null>(null);
@@ -33,7 +33,7 @@ const CounterFinderForm = () => {
       const params = new URLSearchParams({
         championId: champion!.id || champion!.name,
         role: role!,
-        language: "pt-BR",
+        language: locale === "pt" ? "pt-BR" : "en-US",
       });
       const token = getAccessToken();
       const res = await fetch(`/api/counters?${params.toString()}`, {
@@ -101,6 +101,14 @@ const CounterFinderForm = () => {
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{c.reason}</p>
+                {c.howToPlayAgainstIt && (
+                  <div className="surface-2 rounded-md px-2.5 py-2 mt-2">
+                    <p className="text-[9px] font-bold text-brand uppercase tracking-wider mb-1">
+                      {t("counters.howToPlayAgainstIt")}
+                    </p>
+                    <p className="text-xs text-foreground/80 leading-relaxed">{c.howToPlayAgainstIt}</p>
+                  </div>
+                )}
               </div>
             </div>
           ))}

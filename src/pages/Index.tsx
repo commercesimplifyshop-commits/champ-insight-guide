@@ -321,7 +321,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header onLogoClick={handleReset} />
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
         {/* Left sidebar — Ad. Same width as the right sidebar so the main

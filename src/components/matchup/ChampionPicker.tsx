@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Search, X } from "lucide-react";
 import type { Champion } from "@/types/matchup";
 import { useI18n } from "@/lib/i18n";
+import { getRecentChampions, addRecentChampion } from "@/lib/championHistory";
 
 interface ChampionPickerProps {
   label: string;
@@ -16,6 +17,7 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
   const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<Champion[]>([]);
   const [loading, setLoading] = useState(false);
+  const [recents, setRecents] = useState<Champion[]>([]);
   const debounceRef = useRef<number | null>(null);
   const { t } = useI18n();
 
@@ -86,7 +88,10 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
               // debounce 250ms
               debounceRef.current = window.setTimeout(() => fetchSuggestions(v), 250);
             }}
-            onFocus={() => setOpen(true)}
+            onFocus={() => {
+              setOpen(true);
+              if (!query) setRecents(getRecentChampions());
+            }}
             className="bg-transparent text-foreground placeholder:text-muted-foreground outline-none flex-1 text-sm"
           />
         </div>
@@ -98,6 +103,32 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
             <div className="flex items-center justify-center p-4">
               <div className="w-6 h-6 border-2 border-muted-foreground/30 border-t-primary rounded-full animate-spin" />
             </div>
+          ) : !query && recents.length > 0 ? (
+            <>
+              <p className="px-3 pt-2 pb-1 text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
+                {t("selection.recentChampions")}
+              </p>
+              <div className="grid grid-cols-5 gap-0.5 p-1.5 pt-0.5">
+                {recents.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => {
+                      addRecentChampion(c);
+                      onSelect(c);
+                      setOpen(false);
+                      setQuery("");
+                      setSuggestions([]);
+                    }}
+                    className="flex flex-col items-center gap-0.5 p-1.5 rounded hover:bg-secondary/50 transition-colors"
+                  >
+                    <img src={c.image} alt={c.name} className="w-8 h-8 rounded" />
+                    <span className="text-[10px] text-foreground/70 truncate w-full text-center">{c.name}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          ) : !query ? (
+            <p className="p-3 text-xs text-muted-foreground text-center">{t("selection.startTyping")}</p>
           ) : suggestions.length === 0 ? (
             <p className="p-3 text-xs text-muted-foreground text-center">{t("selection.noChampions")}</p>
           ) : (
@@ -105,7 +136,13 @@ const ChampionPicker = ({ label, side, selected, onSelect, onClear }: ChampionPi
               {suggestions.map((c) => (
                 <button
                   key={c.id}
-                  onClick={() => { onSelect(c); setOpen(false); setQuery(""); setSuggestions([]); }}
+                  onClick={() => {
+                    addRecentChampion(c);
+                    onSelect(c);
+                    setOpen(false);
+                    setQuery("");
+                    setSuggestions([]);
+                  }}
                   className="flex flex-col items-center gap-0.5 p-1.5 rounded hover:bg-secondary/50 transition-colors"
                 >
                   <img src={c.image} alt={c.name} className="w-8 h-8 rounded" />

@@ -1,61 +1,16 @@
-import { useEffect, useState } from "react";
 import { Flame } from "lucide-react";
+import { usePromoCountdown } from "@/hooks/use-promo-countdown";
 
 interface PromoCountdownProps {
   /** Extra classes for layout tweaks from the parent (e.g. margin). */
   className?: string;
 }
 
-interface Remaining {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-}
-
-const getRemaining = (deadline: number): Remaining | null => {
-  const diff = deadline - Date.now();
-  if (diff <= 0) return null;
-  const totalSeconds = Math.floor(diff / 1000);
-  return {
-    days: Math.floor(totalSeconds / 86400),
-    hours: Math.floor((totalSeconds % 86400) / 3600),
-    minutes: Math.floor((totalSeconds % 3600) / 60),
-    seconds: totalSeconds % 60,
-  };
-};
-
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/**
- * Countdown to a real, admin-set deadline (GET /api/settings/promo) —
- * deliberately not an infinite/fake timer: once the deadline passes this
- * renders nothing instead of resetting, so the urgency stays honest.
- * Renders nothing while loading or when no promo is active.
- */
+/** Inline countdown text — used inside cards/banners. See PromoBar for the site-wide attention bar. */
 const PromoCountdown = ({ className = "" }: PromoCountdownProps) => {
-  const [deadline, setDeadline] = useState<number | null>(null);
-  const [remaining, setRemaining] = useState<Remaining | null>(null);
-
-  useEffect(() => {
-    fetch("/api/settings/promo")
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data: { deadline: string | null }) => {
-        if (!data.deadline) return;
-        const ts = Date.parse(data.deadline);
-        if (!Number.isNaN(ts)) setDeadline(ts);
-      })
-      .catch(() => {
-        // No active promo (or settings unreachable) — countdown simply stays hidden.
-      });
-  }, []);
-
-  useEffect(() => {
-    if (deadline === null) return;
-    setRemaining(getRemaining(deadline));
-    const interval = setInterval(() => setRemaining(getRemaining(deadline)), 1000);
-    return () => clearInterval(interval);
-  }, [deadline]);
+  const remaining = usePromoCountdown();
 
   if (!remaining) return null;
 

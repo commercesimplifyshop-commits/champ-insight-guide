@@ -5,6 +5,8 @@ export interface CounterEntry {
   name: string;
   image: string | null;
   reason: string;
+  /** Concrete guidance on how to still play well when facing this counter. */
+  howToPlayAgainstIt: string;
   threat: "high" | "medium" | "low";
 }
 
