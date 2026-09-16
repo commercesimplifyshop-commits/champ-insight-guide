@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import type { Role, Champion, MatchupPlan, PlayStyle, MacroStyle } from "@/types/matchup";
 import { MOCK_PLAN } from "@/data/mock-matchup";
@@ -411,6 +412,17 @@ const Index = () => {
                 {!isPremium && isAdsenseConfigured() && rewardAdEnabled && (
                   <p className="text-[10px] text-muted-foreground/70 text-center">
                     {t("ads.rewardHint")}
+                  </p>
+                )}
+
+                {!isPremium && (
+                  <p className="text-center">
+                    <Link
+                      to="/pricing#demo"
+                      className="text-[10px] text-muted-foreground hover:text-foreground underline transition-colors"
+                    >
+                      {t("premium.seeExample")}
+                    </Link>
                   </p>
                 )}
 
