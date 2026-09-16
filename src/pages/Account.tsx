@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, ArrowLeft, Crown, History as HistoryIcon, BarChart3 } from "lucide-react";
+import { Loader2, ArrowLeft, Crown, History as HistoryIcon } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import type { HistoryItem } from "@/types/history";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
@@ -7,18 +7,11 @@ import JungleAnalysisView from "@/components/matchup/JungleAnalysisView";
 import Header from "@/components/layout/Header";
 import { redirectToStripeUrl } from "@/lib/stripeRedirect";
 
-interface UsageData {
-  total: number;
-  byRole: Record<string, number>;
-  topChampions: { name: string; count: number }[];
-}
-
 const Account = () => {
   const { user, loading, isPremium, getAccessToken, refreshPremiumStatus } = useAuth();
   const [billingLoading, setBillingLoading] = useState(false);
   const [billingError, setBillingError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
-  const [usage, setUsage] = useState<UsageData | null>(null);
   const [selected, setSelected] = useState<HistoryItem | null>(null);
 
   useEffect(() => {
@@ -27,15 +20,13 @@ const Account = () => {
     if (!token) return;
     const headers = { Authorization: `Bearer ${token}` };
 
+    // Only ever has your single most recent analysis — saveAnalysis()
+    // replaces the previous one instead of accumulating history, to keep
+    // the database's size bounded (see history.service.ts).
     fetch("/api/history", { headers })
       .then((r) => (r.ok ? r.json() : []))
       .then(setHistory)
       .catch(() => setHistory([]));
-
-    fetch("/api/usage", { headers })
-      .then((r) => (r.ok ? r.json() : null))
-      .then(setUsage)
-      .catch(() => setUsage(null));
   }, [user, getAccessToken]);
 
   const handleCheckout = async () => {
@@ -161,43 +152,10 @@ const Account = () => {
 
         {billingError && <p className="text-xs text-threat">{billingError}</p>}
 
-        {usage && usage.total > 0 && (
-          <div className="glass rounded-2xl border border-white/[.07] p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-brand" />
-              <h2 className="text-sm font-semibold uppercase tracking-wider">Estatísticas de Uso</h2>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-center">
-              <div className="surface-2 rounded-md p-2">
-                <p className="text-lg font-bold text-brand">{usage.total}</p>
-                <p className="text-[10px] text-ink-40 uppercase">Análises</p>
-              </div>
-              {Object.entries(usage.byRole).map(([role, count]) => (
-                <div key={role} className="surface-2 rounded-md p-2">
-                  <p className="text-lg font-bold">{count}</p>
-                  <p className="text-[10px] text-ink-40 uppercase">{role}</p>
-                </div>
-              ))}
-            </div>
-            {usage.topChampions.length > 0 && (
-              <div>
-                <p className="text-[10px] text-ink-40 uppercase tracking-wider mb-1.5">Campeões mais analisados</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {usage.topChampions.map((c) => (
-                    <span key={c.name} className="text-xs surface-2 rounded-full px-2.5 py-1">
-                      {c.name} <span className="text-ink-40">×{c.count}</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         <div className="glass rounded-2xl border border-white/[.07] p-4 space-y-3">
           <div className="flex items-center gap-2">
             <HistoryIcon className="w-4 h-4 text-brand" />
-            <h2 className="text-sm font-semibold uppercase tracking-wider">Histórico de Análises</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-wider">Última Análise</h2>
           </div>
           {history === null ? (
             <Loader2 className="w-4 h-4 animate-spin text-ink-40" />
