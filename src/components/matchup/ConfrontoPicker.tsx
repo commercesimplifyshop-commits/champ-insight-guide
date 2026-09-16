@@ -8,8 +8,8 @@ interface ConfrontoPickerProps {
   enemy: Champion | null;
   onSelectAlly: (champion: Champion) => void;
   onSelectEnemy: (champion: Champion) => void;
+  /** Set via the top nav strip's Matchup/Modo Solo pills, not chosen here. */
   soloMode: boolean;
-  onToggleSoloMode: (solo: boolean) => void;
 }
 
 const initials = (name: string) =>
@@ -68,31 +68,12 @@ const ConfrontoRow = ({
   );
 };
 
-const ConfrontoPicker = ({ ally, enemy, onSelectAlly, onSelectEnemy, soloMode, onToggleSoloMode }: ConfrontoPickerProps) => {
+const ConfrontoPicker = ({ ally, enemy, onSelectAlly, onSelectEnemy, soloMode }: ConfrontoPickerProps) => {
   const { t } = useI18n();
   const [pickerFor, setPickerFor] = useState<"ally" | "enemy" | null>(null);
 
   return (
-    <div className="flex flex-col gap-2.5">
-      <div className="flex gap-[7px]">
-        <button
-          onClick={() => onToggleSoloMode(false)}
-          className={`flex-1 py-2 rounded-full text-xs font-medium border transition-colors ${
-            !soloMode ? "bg-brand/[.14] text-brand border-brand/[.35]" : "glass text-ink-50 border-hairline"
-          }`}
-        >
-          {t("confronto.modeVersus")}
-        </button>
-        <button
-          onClick={() => onToggleSoloMode(true)}
-          className={`flex-1 py-2 rounded-full text-xs font-medium border transition-colors ${
-            soloMode ? "bg-brand/[.14] text-brand border-brand/[.35]" : "glass text-ink-50 border-hairline"
-          }`}
-        >
-          {t("confronto.modeSolo")}
-        </button>
-      </div>
-
+    <div className="flex flex-col gap-1.5">
       <ConfrontoRow champion={ally} side="ally" onClick={() => setPickerFor("ally")} />
 
       {!soloMode && (
