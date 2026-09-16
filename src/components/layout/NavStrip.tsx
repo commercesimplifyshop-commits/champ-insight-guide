@@ -25,28 +25,35 @@ const NavStrip = ({ items }: NavStripProps) => {
       className="border-b border-hairline"
       style={{ background: "rgba(12,13,17,.6)", backdropFilter: "blur(20px)" }}
     >
-      <div className="max-w-3xl mx-auto flex gap-[5px] px-3 py-2.5 overflow-x-auto no-scrollbar">
-      {items.map((item) => {
-        const pillClass = `shrink-0 flex items-center gap-1.5 px-[11px] py-[9px] rounded-full border transition-colors ${
-          item.active ? "bg-brand/[.13] border-brand/[.38] text-brand" : "bg-white/[.035] border-hairline text-[rgba(244,245,243,.62)]"
-        }`;
-        const content: ReactNode = (
-          <>
-            <span className={`w-1.5 h-1.5 rounded-full ${item.active ? "bg-brand" : "bg-white/30"}`} />
-            <span className="text-xs font-medium whitespace-nowrap">{item.label}</span>
-            {item.badge && <span className="font-mono font-bold text-[9px] text-brand">{item.badge}</span>}
-          </>
-        );
-        return item.to ? (
-          <Link key={item.key} to={item.to} className={pillClass}>
-            {content}
-          </Link>
-        ) : (
-          <button key={item.key} onClick={item.onClick} className={pillClass}>
-            {content}
-          </button>
-        );
-      })}
+      {/* Mirrors Index.tsx's content row (max-w-7xl + two 320px ad asides +
+          gap-5) exactly, so the pill strip lines up with <main> below it
+          instead of centering in the full viewport width. */}
+      <div className="max-w-7xl mx-auto px-4 flex gap-5">
+        <div className="hidden lg:block w-[320px] shrink-0" />
+        <div className="flex-1 min-w-0 max-w-3xl mx-auto flex gap-[5px] py-2.5 overflow-x-auto no-scrollbar">
+          {items.map((item) => {
+            const pillClass = `shrink-0 flex items-center gap-1.5 px-[11px] py-[9px] rounded-full border transition-colors ${
+              item.active ? "bg-brand/[.13] border-brand/[.38] text-brand" : "bg-white/[.035] border-hairline text-[rgba(244,245,243,.62)]"
+            }`;
+            const content: ReactNode = (
+              <>
+                <span className={`w-1.5 h-1.5 rounded-full ${item.active ? "bg-brand" : "bg-white/30"}`} />
+                <span className="text-xs font-medium whitespace-nowrap">{item.label}</span>
+                {item.badge && <span className="font-mono font-bold text-[9px] text-brand">{item.badge}</span>}
+              </>
+            );
+            return item.to ? (
+              <Link key={item.key} to={item.to} className={pillClass}>
+                {content}
+              </Link>
+            ) : (
+              <button key={item.key} onClick={item.onClick} className={pillClass}>
+                {content}
+              </button>
+            );
+          })}
+        </div>
+        <div className="hidden lg:block w-[320px] shrink-0" />
       </div>
     </div>
   );
