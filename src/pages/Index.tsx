@@ -38,6 +38,7 @@ const Index = () => {
   const [plan, setPlan] = useState<MatchupPlan | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const noticeTimeoutRef = useRef<number | null>(null);
+  const [rewardAdEnabled, setRewardAdEnabled] = useState(false);
   const { locale, t } = useI18n();
   const { getAccessToken, isPremium } = useAuth();
 
@@ -45,6 +46,13 @@ const Index = () => {
     return () => {
       if (noticeTimeoutRef.current) window.clearTimeout(noticeTimeoutRef.current);
     };
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/settings/reward-ad")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => setRewardAdEnabled(Boolean(data?.enabled)))
+      .catch(() => setRewardAdEnabled(false));
   }, []);
 
   const [debugJson, setDebugJson] = useState("");
@@ -277,7 +285,7 @@ const Index = () => {
   const handleGenerateClick = async () => {
     if (!canAnalyze) return;
 
-    if (isPremium || !isAdsenseConfigured()) {
+    if (isPremium || !isAdsenseConfigured() || !rewardAdEnabled) {
       await runAnalysis();
       return;
     }
@@ -400,7 +408,7 @@ const Index = () => {
                   </button>
                 </div>
 
-                {!isPremium && isAdsenseConfigured() && (
+                {!isPremium && isAdsenseConfigured() && rewardAdEnabled && (
                   <p className="text-[10px] text-muted-foreground/70 text-center">
                     {t("ads.rewardHint")}
                   </p>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, ShieldCheck, CreditCard, AlertTriangle } from "lucide-react";
+import { Loader2, ShieldCheck, CreditCard, AlertTriangle, Gift } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import Header from "@/components/layout/Header";
 
@@ -18,6 +18,11 @@ const Admin = () => {
   const [savingDemoBanner, setSavingDemoBanner] = useState(false);
   const [demoBannerError, setDemoBannerError] = useState<string | null>(null);
 
+  const [rewardAd, setRewardAd] = useState<boolean | null>(null);
+  const [rewardAdLoading, setRewardAdLoading] = useState(true);
+  const [savingRewardAd, setSavingRewardAd] = useState(false);
+  const [rewardAdError, setRewardAdError] = useState<string | null>(null);
+
   useEffect(() => {
     if (!isAdmin) return;
     const token = getAccessToken();
@@ -34,6 +39,12 @@ const Admin = () => {
       .then((data) => setDemoBanner(data.enabled))
       .catch(() => setDemoBannerError("Não foi possível carregar o status do banner."))
       .finally(() => setDemoBannerLoading(false));
+
+    fetch("/api/settings/reward-ad", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data) => setRewardAd(data.enabled))
+      .catch(() => setRewardAdError("Não foi possível carregar o status do anúncio recompensado."))
+      .finally(() => setRewardAdLoading(false));
   }, [isAdmin, getAccessToken]);
 
   const handleStripeModeChange = async (mode: StripeMode) => {
@@ -75,6 +86,27 @@ const Admin = () => {
       setDemoBannerError(err instanceof Error ? err.message : "Falha ao salvar o banner de demonstração.");
     } finally {
       setSavingDemoBanner(false);
+    }
+  };
+
+  const handleRewardAdChange = async (enabled: boolean) => {
+    const token = getAccessToken();
+    if (!token || enabled === rewardAd) return;
+    setSavingRewardAd(true);
+    setRewardAdError(null);
+    try {
+      const res = await fetch("/api/settings/reward-ad", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ enabled }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Falha ao salvar");
+      setRewardAd(data.enabled);
+    } catch (err) {
+      setRewardAdError(err instanceof Error ? err.message : "Falha ao salvar o anúncio recompensado.");
+    } finally {
+      setSavingRewardAd(false);
     }
   };
 
@@ -185,6 +217,47 @@ const Admin = () => {
           )}
 
           {demoBannerError && <p className="text-xs text-threat">{demoBannerError}</p>}
+        </div>
+
+        <div className="surface-1 border border-border rounded-lg p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Gift className="w-4 h-4 text-brand" />
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Anúncio Recompensado</h2>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Controla se "Gerar Plano" exige que usuários gratuitos assistam a um anúncio antes de gerar a análise.
+            Mantenha desativado enquanto o recurso de anúncio recompensado do AdSense não estiver aprovado — sem
+            aprovação, o anúncio nunca carrega e o botão trava (agora com um timeout de 8s como segurança extra,
+            mas o ideal é manter desativado até aprovar).
+          </p>
+
+          {rewardAdLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+          ) : (
+            <div className="flex gap-2">
+              {[
+                { value: true, label: "Ativado" },
+                { value: false, label: "Desativado" },
+              ].map(({ value, label }) => (
+                <button
+                  key={label}
+                  onClick={() => handleRewardAdChange(value)}
+                  disabled={savingRewardAd || rewardAd === value}
+                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all disabled:cursor-not-allowed ${
+                    rewardAd === value
+                      ? "bg-brand text-primary-foreground shadow-brand"
+                      : "surface-2 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {savingRewardAd && rewardAd !== value && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  {label}
+                  {rewardAd === value && " (ativo)"}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {rewardAdError && <p className="text-xs text-threat">{rewardAdError}</p>}
         </div>
       </div>
     </div>
