@@ -221,13 +221,15 @@ const Account = () => {
                       <div className="w-8 h-8 rounded-[9px] overflow-hidden border border-white/10">
                         {meta?.allyImage && <img src={meta.allyImage} alt={item.ally_champion_name} className="w-full h-full object-cover" />}
                       </div>
-                      <div className="w-8 h-8 rounded-[9px] overflow-hidden -ml-2.5 border-2" style={{ borderColor: "#111316" }}>
-                        {meta?.enemyImage && <img src={meta.enemyImage} alt={item.enemy_champion_name} className="w-full h-full object-cover" />}
-                      </div>
+                      {item.enemy_champion_name && (
+                        <div className="w-8 h-8 rounded-[9px] overflow-hidden -ml-2.5 border-2" style={{ borderColor: "#111316" }}>
+                          {meta?.enemyImage && <img src={meta.enemyImage} alt={item.enemy_champion_name} className="w-full h-full object-cover" />}
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-sm truncate">
-                        {item.ally_champion_name} vs {item.enemy_champion_name}
+                        {item.enemy_champion_name ? `${item.ally_champion_name} vs ${item.enemy_champion_name}` : item.ally_champion_name}
                       </div>
                       <div className="font-mono text-[11px] text-ink-40 mt-0.5">{item.role}</div>
                     </div>

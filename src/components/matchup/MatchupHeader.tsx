@@ -54,23 +54,25 @@ const MatchupHeader = ({ meta, onReset, playstyleLabel, macroStyleLabel, peakTim
               </div>
             )}
           </div>
-          <div
-            className="w-[52px] h-[52px] rounded-[14px] overflow-hidden border -ml-2.5"
-            style={{ borderColor: "rgba(255,110,126,.3)" }}
-          >
-            {meta.enemyImage ? (
-              <img src={meta.enemyImage} alt={meta.enemyChampion} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-[repeating-linear-gradient(135deg,rgba(255,110,126,.14)_0_5px,rgba(255,110,126,.05)_5px_10px)]">
-                <span className="font-mono font-bold text-[15px] text-threat">{initials(meta.enemyChampion)}</span>
-              </div>
-            )}
-          </div>
+          {meta.enemyChampion && (
+            <div
+              className="w-[52px] h-[52px] rounded-[14px] overflow-hidden border -ml-2.5"
+              style={{ borderColor: "rgba(255,110,126,.3)" }}
+            >
+              {meta.enemyImage ? (
+                <img src={meta.enemyImage} alt={meta.enemyChampion} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-[repeating-linear-gradient(135deg,rgba(255,110,126,.14)_0_5px,rgba(255,110,126,.05)_5px_10px)]">
+                  <span className="font-mono font-bold text-[15px] text-threat">{initials(meta.enemyChampion)}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-[19px] leading-[1.2] tracking-[-.3px] truncate">
-            {meta.allyChampion} vs {meta.enemyChampion}
+            {meta.enemyChampion ? `${meta.allyChampion} vs ${meta.enemyChampion}` : meta.allyChampion}
           </div>
           <div className="font-mono text-[11.5px] text-ink-40 mt-0.5">
             {meta.role.toUpperCase()}
@@ -97,10 +99,12 @@ const MatchupHeader = ({ meta, onReset, playstyleLabel, macroStyleLabel, peakTim
       </div>
 
       <div className="flex gap-2 mt-4">
-        <div className="flex-1 glass rounded-[13px] border border-white/[.06] px-3 py-2.5">
-          <div className="font-mono text-[9px] tracking-[.7px] text-ink-40">{t("matchup.difficulty").toUpperCase()}</div>
-          <div className={`font-mono font-bold text-xl mt-1 ${diff.color}`}>{t(diff.labelKey)}</div>
-        </div>
+        {!meta.isSolo && (
+          <div className="flex-1 glass rounded-[13px] border border-white/[.06] px-3 py-2.5">
+            <div className="font-mono text-[9px] tracking-[.7px] text-ink-40">{t("matchup.difficulty").toUpperCase()}</div>
+            <div className={`font-mono font-bold text-xl mt-1 ${diff.color}`}>{t(diff.labelKey)}</div>
+          </div>
+        )}
         {peakTiming && (
           <div className="flex-1 glass rounded-[13px] border border-white/[.06] px-3 py-2.5">
             <div className="font-mono text-[9px] tracking-[.7px] text-ink-40">{t("matchup.peak").toUpperCase()}</div>
