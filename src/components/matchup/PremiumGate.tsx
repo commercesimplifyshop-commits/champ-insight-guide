@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Lock, Loader2 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
@@ -64,6 +65,9 @@ const PremiumGate = ({ sectionTitles }: PremiumGateProps) => {
           {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
           {user ? t("premium.subscribe") : t("premium.loginToUnlock")}
         </button>
+        <Link to="/pricing#demo" className="text-[10px] text-muted-foreground hover:text-foreground underline transition-colors">
+          {t("premium.seeExample")}
+        </Link>
       </div>
 
       <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />

@@ -142,6 +142,7 @@ const translations = {
   "premium.unlock": { pt: "Ver Análise Completa", en: "See Full Analysis" },
   "premium.subscribe": { pt: "Assinar Premium", en: "Subscribe" },
   "premium.loginToUnlock": { pt: "Entrar para Assinar", en: "Log In to Subscribe" },
+  "premium.seeExample": { pt: "Veja um exemplo grátis vs. Premium →", en: "See a free vs. Premium example →" },
   "phase.midGame": { pt: "Mid Game", en: "Mid Game" },
   "phase.lateGame": { pt: "Late Game", en: "Late Game" },
 
