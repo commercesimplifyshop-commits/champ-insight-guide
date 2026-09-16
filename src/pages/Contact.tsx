@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useI18n } from "@/lib/i18n";
 import { getRecaptchaToken } from "@/lib/recaptcha";
+import Seo from "@/components/seo/Seo";
 
 const Contact = () => {
   const { t } = useI18n();
@@ -46,6 +47,11 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <Seo
+        title="Contato e Suporte"
+        description="Fale com o suporte do MATCHUP.GG — dúvidas, problemas com sua assinatura ou sugestões."
+        path="/contact"
+      />
       <Header />
 
       <main className="flex-1 max-w-xl mx-auto px-4 py-10 space-y-6 w-full">

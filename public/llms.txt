@@ -1,0 +1,29 @@
+# MATCHUP.GG
+
+> AI-powered League of Legends strategy companion. Generates matchup, counter, and draft analysis plans grounded in real per-champion Data Dragon facts (current patch stats, abilities, official tips), not just an LLM's training memory.
+
+MATCHUP.GG is a web app (https://www.matchupgg.com) for League of Legends players preparing for a game. Content and UI default to Brazilian Portuguese (pt-BR), with an English option. It does not call the authenticated Riot Games API — champion data comes from Riot's public Data Dragon CDN only; no summoner, match, or rank data is read or stored.
+
+## Features
+
+- Matchup 1v1: pick a role, your champion, and an enemy champion (lane or jungle) to get a strategic plan covering early/mid/late game, power spikes, itemization, and common mistakes to avoid.
+- Modo Solo (solo champion plan): same flow without an enemy champion, for players who want a general game plan for their own champion and role rather than a specific counter-matchup.
+- Counter Finder: AI-suggested counter-pick champions for a given enemy champion and role.
+- Draft 5v5: full team composition analysis across both teams.
+- Coach IA: chat-based coaching, in development (not yet live).
+
+## Access model
+
+- Free tier: limited number of plan generations, with a shorter/summarized result.
+- Premium (paid subscription via Stripe): unlimited generations, full-depth results (mid/late game, itemization, mistakes), and history of the user's most recent saved analysis.
+
+## Pages
+
+- [Home / app](https://www.matchupgg.com/): the matchup, solo, counter finder, and draft tools.
+- [Pricing](https://www.matchupgg.com/pricing): free vs Premium feature comparison and checkout.
+- [Contact](https://www.matchupgg.com/contact): support form.
+- [Privacy Policy](https://www.matchupgg.com/privacy): data handling and cookie policy.
+
+## Notes for automated crawlers
+
+This is a client-rendered (React/Vite SPA) site — the pages above return meaningful content only after JavaScript executes. If your crawler does not run JavaScript, treat this file as the authoritative summary of the product instead of the raw HTML.
