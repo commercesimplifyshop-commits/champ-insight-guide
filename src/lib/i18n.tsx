@@ -168,6 +168,13 @@ const translations = {
   "cookies.learnMore": { pt: "Saiba mais", en: "Learn more" },
   "cookies.accept": { pt: "Aceitar", en: "Accept" },
 
+  // Playstyle selector
+  "playstyle.label": { pt: "Seu estilo de jogo", en: "Your playstyle" },
+  "playstyle.balanced": { pt: "Equilibrado", en: "Balanced" },
+  "playstyle.aggressive": { pt: "Agressivo", en: "Aggressive" },
+  "playstyle.patient": { pt: "Paciente", en: "Patient" },
+  "playstyle.cautious": { pt: "Cauteloso", en: "Cautious" },
+
   // Demo mode banner
   "demo.banner": {
     pt: "MATCHUP.GG está em construção e em modo de demonstração. Assinaturas criadas agora não serão processadas nem mantidas.",
