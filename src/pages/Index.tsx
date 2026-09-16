@@ -584,7 +584,13 @@ const Index = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            <MatchupHeader meta={plan.meta} onReset={handleReset} />
+            <MatchupHeader
+              meta={plan.meta}
+              onReset={handleReset}
+              playstyleLabel={playstyle ? t(`playstyle.${playstyle}` as TranslationKey) : undefined}
+              macroStyleLabel={macroStyle ? t(`macrostyle.${macroStyle}` as TranslationKey) : undefined}
+              peakTiming={plan.powerSpikes.find((s) => s.advantage === "ally")?.timing ?? null}
+            />
 
             {plan.type === "jungle" ? (
               <JungleAnalysisView plan={plan} />
