@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { Loader2, Crown } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { useI18n } from "@/lib/i18n";
 import AuthDialog from "@/components/auth/AuthDialog";
 import { redirectToStripeUrl } from "@/lib/stripeRedirect";
 
@@ -17,6 +19,7 @@ interface FeatureGateProps {
  */
 const FeatureGate = ({ title, description, children }: FeatureGateProps) => {
   const { user, isPremium, loading, getAccessToken } = useAuth();
+  const { t } = useI18n();
   const [authOpen, setAuthOpen] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
 
@@ -63,6 +66,9 @@ const FeatureGate = ({ title, description, children }: FeatureGateProps) => {
         {checkoutLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
         {user ? "Assinar Premium" : "Entrar para Assinar"}
       </button>
+      <Link to="/pricing#demo" className="text-[10px] text-muted-foreground hover:text-foreground underline transition-colors">
+        {t("premium.seeExample")}
+      </Link>
 
       <AuthDialog open={authOpen} onOpenChange={setAuthOpen} />
     </div>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Check, X, Crown, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import Header from "@/components/layout/Header";
@@ -6,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import AuthDialog from "@/components/auth/AuthDialog";
 import { redirectToStripeUrl } from "@/lib/stripeRedirect";
 import PromoCountdown from "@/components/monetization/PromoCountdown";
+import PlanComparisonDemo from "@/components/pricing/PlanComparisonDemo";
 
 interface FeatureRow {
   label: string;
@@ -34,8 +36,21 @@ const Cell = ({ value }: { value: boolean | string }) => {
 
 const Pricing = () => {
   const { user, isPremium, getAccessToken } = useAuth();
+  const location = useLocation();
   const [authOpen, setAuthOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // React Router doesn't scroll to hash fragments on client-side navigation
+  // (only the browser's native full-page-load behavior does) — links like
+  // <Link to="/pricing#demo"> from other pages would otherwise land at the
+  // top of the page instead of the comparison demo.
+  useEffect(() => {
+    if (location.hash !== "#demo") return;
+    const id = requestAnimationFrame(() => {
+      document.getElementById("demo")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [location.hash]);
 
   const handleSubscribe = async () => {
     if (!user) {
@@ -132,6 +147,16 @@ const Pricing = () => {
               ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="space-y-3">
+          <div className="text-center space-y-1">
+            <h2 className="text-lg font-extrabold text-foreground">Veja a diferença na prática</h2>
+            <p className="text-xs text-muted-foreground">
+              Mesmo confronto, resultado gratuito vs. Premium — alterna automaticamente a cada 8s ou clique para comparar.
+            </p>
+          </div>
+          <PlanComparisonDemo />
         </div>
 
         <p className="text-[10px] text-muted-foreground/70 text-center leading-relaxed px-6">
