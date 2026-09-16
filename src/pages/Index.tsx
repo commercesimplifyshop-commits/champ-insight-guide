@@ -366,7 +366,7 @@ const Index = () => {
         <main className="flex-1 min-w-0 max-w-3xl mx-auto space-y-4">
         {!plan ? (
           <div className="space-y-5">
-            <PricingBanner mode={mode} />
+            <PricingBanner />
 
             {mode === "counters" ? (
               <CounterFinder />
