@@ -24,7 +24,7 @@ const PowerSpikesList = ({ spikes }: PowerSpikesListProps) => {
             <span className="font-mono text-xs font-bold text-muted-foreground w-20 shrink-0">
               {spike.timing}
             </span>
-            <span className="text-xs text-foreground/80 flex-1">{spike.description}</span>
+            <span className="text-xs text-foreground/80 flex-1 min-w-0 break-words">{spike.description}</span>
             <span className={`text-[10px] font-bold uppercase tracking-wider shrink-0 ${style.text}`}>
               {t(style.labelKey)}
             </span>
