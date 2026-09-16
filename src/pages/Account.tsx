@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, ArrowLeft, Crown, History as HistoryIcon } from "lucide-react";
+import { Loader2, ArrowLeft, Crown, History as HistoryIcon, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import type { HistoryItem } from "@/types/history";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
@@ -8,7 +8,7 @@ import Header from "@/components/layout/Header";
 import { redirectToStripeUrl } from "@/lib/stripeRedirect";
 
 const Account = () => {
-  const { user, loading, isPremium, getAccessToken, refreshPremiumStatus } = useAuth();
+  const { user, loading, isPremium, getAccessToken, refreshPremiumStatus, signOut } = useAuth();
   const [billingLoading, setBillingLoading] = useState(false);
   const [billingError, setBillingError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
@@ -126,9 +126,16 @@ const Account = () => {
           >
             <span className="font-mono font-bold text-[15px] text-ink-70">{initials}</span>
           </div>
-          <div>
-            <h1 className="font-semibold text-lg">{user.email}</h1>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-semibold text-lg truncate">{user.email}</h1>
           </div>
+          <button
+            onClick={() => signOut()}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/[.12] text-xs font-medium text-ink-70 hover:text-threat hover:border-threat/30 transition-colors shrink-0"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Sair
+          </button>
         </div>
 
         <div className="glass rounded-2xl border p-4 flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: "rgba(245,178,26,.2)" }}>
