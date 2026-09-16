@@ -18,7 +18,7 @@ const PremiumGate = ({ sectionTitles }: PremiumGateProps) => {
   const [paywallOpen, setPaywallOpen] = useState(false);
 
   return (
-    <div className="relative rounded-2xl border border-dashed border-brand/40 glass overflow-hidden">
+    <div className="relative rounded-2xl border border-dashed border-brand/40 glass overflow-hidden min-h-[240px]">
       <div className="p-4 space-y-1.5 blur-[3px] opacity-50 pointer-events-none select-none" aria-hidden="true">
         {sectionTitles.map((title) => (
           <div key={title} className="flex items-center gap-2 px-3 py-2 rounded-md bg-white/[.05] text-sm text-ink-70">
