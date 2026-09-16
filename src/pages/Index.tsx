@@ -1,20 +1,20 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import type { Role, Champion, MatchupPlan, PlayStyle, MacroStyle } from "@/types/matchup";
+import type { HistoryItem } from "@/types/history";
 import { MOCK_PLAN } from "@/data/mock-matchup";
 import { MOCK_JUNGLE_PLAN } from "@/data/mock-jungle-matchup";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, type TranslationKey } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { getRecaptchaToken } from "@/lib/recaptcha";
 import { isAdsenseConfigured, requestRewardedAd } from "@/lib/adsense";
 import { recommendStyles } from "@/lib/playstyleRecommendation";
 
-import HeroBanner from "@/components/matchup/HeroBanner";
 import RoleSelector from "@/components/matchup/RoleSelector";
 import PlaystyleSelector from "@/components/matchup/PlaystyleSelector";
 import MacroStyleSelector from "@/components/matchup/MacroStyleSelector";
-import ChampionPicker from "@/components/matchup/ChampionPicker";
+import ConfrontoPicker from "@/components/matchup/ConfrontoPicker";
 import MatchupHeader from "@/components/matchup/MatchupHeader";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
 import JungleAnalysisView from "@/components/matchup/JungleAnalysisView";
@@ -24,11 +24,18 @@ import TeamAnalysis from "@/components/teamanalysis/TeamAnalysis";
 import PricingBanner from "@/components/monetization/PricingBanner";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
+import NavStrip, { type NavStripItem } from "@/components/layout/NavStrip";
 
 export type AppMode = "matchup" | "counters" | "team";
 
+const VALID_MODES: AppMode[] = ["matchup", "counters", "team"];
+
 const Index = () => {
-  const [mode, setMode] = useState<AppMode>("matchup");
+  const [searchParams] = useSearchParams();
+  const initialMode = searchParams.get("mode");
+  const [mode, setMode] = useState<AppMode>(
+    VALID_MODES.includes(initialMode as AppMode) ? (initialMode as AppMode) : "matchup",
+  );
   const [role, setRole] = useState<Role | null>(null);
   const [ally, setAlly] = useState<Champion | null>(null);
   const [enemy, setEnemy] = useState<Champion | null>(null);
@@ -40,14 +47,30 @@ const Index = () => {
   const [notice, setNotice] = useState<string | null>(null);
   const noticeTimeoutRef = useRef<number | null>(null);
   const [rewardAdEnabled, setRewardAdEnabled] = useState(false);
+  const [recents, setRecents] = useState<HistoryItem[] | null>(null);
   const { locale, t } = useI18n();
-  const { getAccessToken, isPremium } = useAuth();
+  const { user, getAccessToken, isPremium } = useAuth();
 
   useEffect(() => {
     return () => {
       if (noticeTimeoutRef.current) window.clearTimeout(noticeTimeoutRef.current);
     };
   }, []);
+
+  // "RECENTES" on the home form — only real data: premium users' saved
+  // analyses. No fabricated winrate (the API never computes one).
+  useEffect(() => {
+    if (!user || !isPremium) {
+      setRecents(null);
+      return;
+    }
+    const token = getAccessToken();
+    if (!token) return;
+    fetch("/api/history", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: HistoryItem[]) => setRecents(Array.isArray(data) ? data.slice(0, 3) : []))
+      .catch(() => setRecents([]));
+  }, [user, isPremium, getAccessToken]);
 
   useEffect(() => {
     fetch("/api/settings/reward-ad")
@@ -320,9 +343,17 @@ const Index = () => {
     setPlan(null);
   };
 
+  const navItems: NavStripItem[] = [
+    { key: "matchup", label: t("nav.matchup"), active: mode === "matchup", onClick: () => setMode("matchup") },
+    { key: "draft", label: t("nav.draft"), active: mode === "team", onClick: () => setMode("team") },
+    { key: "coach", label: t("nav.coach"), badge: "PRO", active: false, to: "/coach" },
+    { key: "perfil", label: t("nav.profile"), active: false, to: "/account" },
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen app-bg">
       <Header onLogoClick={handleReset} />
+      {!plan && <NavStrip items={navItems} />}
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-5">
         {/* Left sidebar — Ad. Same width as the right sidebar so the main
@@ -336,7 +367,6 @@ const Index = () => {
         {!plan ? (
           <div className="space-y-5">
             <PricingBanner mode={mode} />
-            <HeroBanner mode={mode} onSelectMode={setMode} />
 
             {mode === "counters" ? (
               <CounterFinder />
@@ -344,15 +374,13 @@ const Index = () => {
               <TeamAnalysis />
             ) : (
               <>
-                <div className="text-center space-y-1">
-                  <h1 className="text-lg font-extrabold text-foreground tracking-tight">
+                <div className="space-y-1">
+                  <h1 className="font-semibold text-[25px] leading-[1.15] tracking-[-.7px]">
                     {t("selection.title")}
                   </h1>
-                  <p className="text-xs text-muted-foreground">
-                    {t("selection.subtitle")}
-                  </p>
+                  <p className="text-[13px] text-ink-50">{t("selection.subtitle")}</p>
                   {notice && (
-                    <div className="max-w-3xl mx-auto px-4 mt-3">
+                    <div className="pt-3">
                       <div role="status" className="rounded-md border border-caution bg-caution/10 text-caution px-4 py-2 text-sm shadow-sm">
                         {notice}
                       </div>
@@ -360,38 +388,64 @@ const Index = () => {
                   )}
                 </div>
 
-                <div className="flex justify-center">
+                <div className="space-y-3.5">
+                  <p className="font-mono text-[9.5px] tracking-[.9px] text-ink-40 uppercase">
+                    {t("form.step1Label")}
+                  </p>
+                  <ConfrontoPicker
+                    ally={ally}
+                    enemy={enemy}
+                    onSelectAlly={handleSelectAlly}
+                    onSelectEnemy={setEnemy}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <p className="font-mono text-[9.5px] tracking-[.9px] text-ink-40 uppercase">
+                    {t("form.step2Label")}
+                  </p>
                   <RoleSelector selected={role} onSelect={handleSelectRole} />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <ChampionPicker
-                    label={t("selection.yourChampion")}
-                    side="ally"
-                    selected={ally}
-                    onSelect={handleSelectAlly}
-                    onClear={() => handleSelectAlly(null)}
-                  />
-                  <ChampionPicker
-                    label={t("selection.enemyChampion")}
-                    side="enemy"
-                    selected={enemy}
-                    onSelect={setEnemy}
-                    onClear={() => setEnemy(null)}
-                  />
+                <div className="space-y-3">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-mono text-[9.5px] tracking-[.9px] text-ink-40 uppercase">
+                      {t("form.step3Label")}
+                    </span>
+                    <span className="text-[10.5px] text-ink-40">{t("form.step3Hint")}</span>
+                  </div>
+                  <PlaystyleSelector selected={playstyle} onSelect={setPlaystyle} />
                 </div>
 
-                <PlaystyleSelector selected={playstyle} onSelect={setPlaystyle} />
-                <MacroStyleSelector selected={macroStyle} onSelect={setMacroStyle} />
+                <div className="space-y-3">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="font-mono text-[9.5px] tracking-[.9px] text-ink-40 uppercase">
+                      {t("form.step4Label")}
+                    </span>
+                    {ally && (
+                      <span className="text-[10.5px] text-ink-40">
+                        {t("form.step4HintPrefix")} {ally.name} {t("form.step4HintSuffix")}
+                      </span>
+                    )}
+                  </div>
+                  <MacroStyleSelector selected={macroStyle} onSelect={setMacroStyle} />
+                </div>
 
-                <div className="flex justify-center pt-2">
+                <div
+                  className="sticky bottom-0 z-30 pt-3 pb-3.5"
+                  style={{
+                    background: "linear-gradient(180deg, rgba(10,11,14,0) 0%, rgba(10,11,14,.82) 38%, rgba(10,11,14,.96) 100%)",
+                    backdropFilter: "blur(14px)",
+                    paddingBottom: "calc(14px + env(safe-area-inset-bottom))",
+                  }}
+                >
                   <button
                     onClick={handleGenerateClick}
                     disabled={!canAnalyze || loading || adGateLoading}
-                    className={`px-8 py-2.5 rounded-lg text-sm font-bold uppercase tracking-wider transition-all ${canAnalyze
-                      ? "bg-brand text-primary-foreground hover:brightness-110 shadow-brand"
-                      : "surface-2 text-muted-foreground cursor-not-allowed"
-                      }`}
+                    className={`w-full h-14 rounded-2xl flex items-center justify-center gap-2 font-bold text-base tracking-[-.2px] transition-transform active:scale-[.99] ${
+                      canAnalyze ? "shadow-brand" : "bg-white/[.06] text-ink-40 cursor-not-allowed"
+                    }`}
+                    style={canAnalyze ? { background: "linear-gradient(180deg,#FFC94A,#F5B21A)", color: "var(--on-accent)" } : undefined}
                   >
                     {adGateLoading ? (
                       <span className="flex items-center gap-2">
@@ -404,29 +458,43 @@ const Index = () => {
                         {t("selection.analyzing")}
                       </span>
                     ) : (
-                      t("selection.generatePlan")
+                      <>
+                        {t("selection.generatePlan")}
+                        <span className="font-mono text-xs opacity-60">IA</span>
+                      </>
                     )}
                   </button>
+
+                  {!isPremium && isAdsenseConfigured() && rewardAdEnabled && (
+                    <p className="text-[10px] text-ink-40 text-center mt-2">{t("ads.rewardHint")}</p>
+                  )}
+
+                  {(role || playstyle || macroStyle) && (
+                    <div className="flex items-center justify-center gap-2 mt-2 font-mono text-[11px] flex-wrap">
+                      {!isPremium && (
+                        <Link to="/pricing#demo" className="text-ink-40 hover:text-ink-70 transition-colors underline">
+                          {t("premium.seeExample")}
+                        </Link>
+                      )}
+                      <span className="text-brand/75">
+                        {[role, playstyle, macroStyle]
+                          .filter(Boolean)
+                          .map((v, i) => {
+                            const key =
+                              i === 0
+                                ? (`role.${v}` as TranslationKey)
+                                : i === 1
+                                  ? (`playstyle.${v}` as TranslationKey)
+                                  : (`macrostyle.${v}` as TranslationKey);
+                            return `· ${t(key)}`;
+                          })
+                          .join(" ")}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
-                {!isPremium && isAdsenseConfigured() && rewardAdEnabled && (
-                  <p className="text-[10px] text-muted-foreground/70 text-center">
-                    {t("ads.rewardHint")}
-                  </p>
-                )}
-
-                {!isPremium && (
-                  <p className="text-center">
-                    <Link
-                      to="/pricing#demo"
-                      className="text-[10px] text-muted-foreground hover:text-foreground underline transition-colors"
-                    >
-                      {t("premium.seeExample")}
-                    </Link>
-                  </p>
-                )}
-
-                <p className="text-[10px] text-muted-foreground text-center leading-relaxed px-6">
+                <p className="text-[10px] text-ink-40 text-center leading-relaxed px-6">
                   {t("selection.recaptchaPrefix")}{" "}
                   <a
                     href="https://policies.google.com/privacy"
@@ -447,6 +515,46 @@ const Index = () => {
                   </a>{" "}
                   {t("selection.recaptchaSuffix")}
                 </p>
+
+                {isPremium && recents && recents.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[10px] tracking-[.9px] text-ink-40 uppercase">
+                        {t("recents.title")}
+                      </span>
+                      <Link to="/account" className="text-[11.5px] text-brand">
+                        {t("recents.seeAll")}
+                      </Link>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {recents.map((r) => {
+                        const meta = r.plan?.meta;
+                        return (
+                          <button
+                            key={r.id}
+                            onClick={() => setPlan(r.plan)}
+                            className="glass w-full flex items-center gap-3 rounded-[14px] border border-white/[.06] px-3.5 py-3 text-left"
+                          >
+                            <div className="flex items-center shrink-0">
+                              <div className="w-8 h-8 rounded-[9px] overflow-hidden border border-white/10">
+                                {meta?.allyImage && <img src={meta.allyImage} alt={r.ally_champion_name} className="w-full h-full object-cover" />}
+                              </div>
+                              <div className="w-8 h-8 rounded-[9px] overflow-hidden -ml-2.5 border-2" style={{ borderColor: "#111316" }}>
+                                {meta?.enemyImage && <img src={meta.enemyImage} alt={r.enemy_champion_name} className="w-full h-full object-cover" />}
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-sm truncate">
+                                {r.ally_champion_name} vs {r.enemy_champion_name}
+                              </div>
+                              <div className="font-mono text-[11px] text-ink-40 mt-0.5">{r.role}</div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {isDebug && (
                   <div className="space-y-2 border border-dashed border-muted-foreground/30 rounded-lg p-4">
