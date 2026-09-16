@@ -29,6 +29,8 @@ const translations = {
   "selection.analyzing": { pt: "Analisando...", en: "Analyzing..." },
   "selection.searchChampion": { pt: "Buscar campeão...", en: "Search champion..." },
   "selection.noChampions": { pt: "Nenhum campeão encontrado", en: "No champions found" },
+  "selection.recentChampions": { pt: "Buscados recentemente", en: "Recently searched" },
+  "selection.startTyping": { pt: "Digite para buscar um campeão", en: "Start typing to search a champion" },
   "selection.recaptchaPrefix": {
     pt: "Este site é protegido por reCAPTCHA e se aplicam a",
     en: "This site is protected by reCAPTCHA and the Google",
@@ -126,6 +128,7 @@ const translations = {
   "counters.threat.high": { pt: "AMEAÇA ALTA", en: "HIGH THREAT" },
   "counters.threat.medium": { pt: "AMEAÇA MÉDIA", en: "MEDIUM THREAT" },
   "counters.threat.low": { pt: "AMEAÇA BAIXA", en: "LOW THREAT" },
+  "counters.howToPlayAgainstIt": { pt: "Como jogar contra", en: "How to play against it" },
   "counters.disclaimer": {
     pt: "Sugestões geradas por IA com base em conhecimento geral do jogo, não em estatísticas de partidas reais.",
     en: "AI-generated suggestions based on general game knowledge, not real match statistics.",
