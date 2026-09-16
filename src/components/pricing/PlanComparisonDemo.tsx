@@ -3,8 +3,8 @@ import MatchupHeader from "@/components/matchup/MatchupHeader";
 import LaneAnalysisView from "@/components/matchup/LaneAnalysisView";
 import { demoFreePlan, demoPremiumPlan } from "@/data/plan-comparison-demo";
 
-const AUTO_CYCLE_MS = 8000;
-const FADE_MS = 300;
+const AUTO_CYCLE_MS = 4500;
+const FADE_MS = 200;
 
 /**
  * Illustrates the free vs Premium difference using the REAL result
