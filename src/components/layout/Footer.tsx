@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 interface FooterProps {
@@ -11,6 +12,10 @@ const Footer = ({ patch }: FooterProps) => {
   return (
     <footer className="border-t border-border mt-8">
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-2">
+        <p className="flex items-center justify-center gap-1.5 text-[11px] font-medium text-brand/90">
+          <Sparkles className="w-3 h-3" />
+          {t("footer.poweredByAi")}
+        </p>
         <p className="text-[11px] text-muted-foreground leading-relaxed max-w-2xl mx-auto text-center">
           {t("footer.disclaimer")}
         </p>

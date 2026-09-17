@@ -5,7 +5,7 @@ import type { TeamAnalysisPlan } from "@/types/team-analysis";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import FeatureGate from "@/components/shared/FeatureGate";
-import ChampionPicker from "@/components/matchup/ChampionPicker";
+import ChampionSheet from "@/components/matchup/ChampionSheet";
 import ContentBlock from "@/components/matchup/ContentBlock";
 
 const GOLD = "text-brand border-brand/30";
@@ -24,28 +24,80 @@ const ROLES: { value: Role; label: string }[] = [
 type TeamPicks = Record<Role, Champion | null>;
 const emptyTeam = (): TeamPicks => ({ top: null, jungle: null, mid: null, adc: null, support: null });
 
+const initials = (name: string) =>
+  name
+    .split(/[\s'’]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+
+/** Compact trigger row (portrait + role + name) that opens the shared
+ * ChampionSheet bottom sheet — same pattern as ConfrontoPicker's 1v1 rows,
+ * scaled to 10 slots (5 roles x 2 sides) instead of a dropdown-style
+ * autocomplete per slot, which doesn't hold up well at that count on mobile. */
+const TeamRosterRow = ({
+  role,
+  side,
+  champion,
+  onClick,
+}: {
+  role: { value: Role; label: string };
+  side: "ally" | "enemy";
+  champion: Champion | null;
+  onClick: () => void;
+}) => {
+  const isAlly = side === "ally";
+  const tint = isAlly ? "rgba(245,178,26,.2)" : "rgba(255,110,126,.2)";
+  const portraitBg = isAlly
+    ? "repeating-linear-gradient(135deg,rgba(255,255,255,.1) 0 5px,rgba(255,255,255,.04) 5px 10px)"
+    : "repeating-linear-gradient(135deg,rgba(255,110,126,.14) 0 5px,rgba(255,110,126,.05) 5px 10px)";
+
+  return (
+    <button
+      onClick={onClick}
+      className="glass w-full flex items-center gap-2.5 rounded-[14px] px-3.5 py-2.5 text-left transition-transform active:scale-[.99] border"
+      style={{ borderColor: tint }}
+    >
+      <div
+        className="w-9 h-9 rounded-[11px] shrink-0 flex items-center justify-center border overflow-hidden"
+        style={{ background: portraitBg, borderColor: tint }}
+      >
+        {champion?.image ? (
+          <img src={champion.image} alt={champion.name} className="w-full h-full object-cover" />
+        ) : (
+          <span className={`font-mono font-bold text-xs ${isAlly ? "text-brand" : "text-threat"}`}>
+            {champion ? initials(champion.name) : "?"}
+          </span>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className={`font-mono text-[9px] tracking-[.8px] mb-0.5 ${isAlly ? "text-brand" : "text-threat"}`}>
+          {role.label.toUpperCase()}
+        </div>
+        <div className="font-semibold text-sm truncate">{champion ? champion.name : "Escolher campeão"}</div>
+      </div>
+      <span className="font-mono text-[10px] text-ink-40 shrink-0">trocar ›</span>
+    </button>
+  );
+};
+
 const TeamRoster = ({
   label,
   side,
   picks,
-  onSelect,
+  onOpenPicker,
 }: {
   label: string;
   side: "ally" | "enemy";
   picks: TeamPicks;
-  onSelect: (role: Role, champion: Champion | null) => void;
+  onOpenPicker: (role: Role) => void;
 }) => (
   <div className="space-y-2">
     <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold text-center">{label}</p>
     {ROLES.map((r) => (
-      <ChampionPicker
-        key={r.value}
-        label={r.label}
-        side={side}
-        selected={picks[r.value]}
-        onSelect={(c) => onSelect(r.value, c)}
-        onClear={() => onSelect(r.value, null)}
-      />
+      <TeamRosterRow key={r.value} role={r} side={side} champion={picks[r.value]} onClick={() => onOpenPicker(r.value)} />
     ))}
   </div>
 );
@@ -55,6 +107,7 @@ const TeamAnalysisForm = () => {
   const { getAccessToken } = useAuth();
   const [allyPicks, setAllyPicks] = useState<TeamPicks>(emptyTeam());
   const [enemyPicks, setEnemyPicks] = useState<TeamPicks>(emptyTeam());
+  const [pickerFor, setPickerFor] = useState<{ side: "ally" | "enemy"; role: Role } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<TeamAnalysisPlan | null>(null);
@@ -216,9 +269,21 @@ const TeamAnalysisForm = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <TeamRoster label="Seu Time" side="ally" picks={allyPicks} onSelect={(role, c) => setAllyPicks((p) => ({ ...p, [role]: c }))} />
-        <TeamRoster label="Time Inimigo" side="enemy" picks={enemyPicks} onSelect={(role, c) => setEnemyPicks((p) => ({ ...p, [role]: c }))} />
+        <TeamRoster label="Seu Time" side="ally" picks={allyPicks} onOpenPicker={(role) => setPickerFor({ side: "ally", role })} />
+        <TeamRoster label="Time Inimigo" side="enemy" picks={enemyPicks} onOpenPicker={(role) => setPickerFor({ side: "enemy", role })} />
       </div>
+
+      <ChampionSheet
+        open={pickerFor !== null}
+        label={pickerFor ? `${pickerFor.side === "ally" ? "Seu Time" : "Time Inimigo"} · ${ROLES.find((r) => r.value === pickerFor.role)?.label ?? ""}` : ""}
+        selected={pickerFor ? (pickerFor.side === "ally" ? allyPicks : enemyPicks)[pickerFor.role] : null}
+        onClose={() => setPickerFor(null)}
+        onSelect={(c) => {
+          if (!pickerFor) return;
+          const setPicks = pickerFor.side === "ally" ? setAllyPicks : setEnemyPicks;
+          setPicks((p) => ({ ...p, [pickerFor.role]: c }));
+        }}
+      />
 
       <div className="flex justify-center pt-2">
         <button
