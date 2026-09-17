@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, ShieldCheck, CreditCard, AlertTriangle, Gift, Cpu, Flame } from "lucide-react";
+import { Loader2, ShieldCheck, CreditCard, AlertTriangle, Gift, Cpu, Flame, RefreshCw } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import Header from "@/components/layout/Header";
 import Seo from "@/components/seo/Seo";
@@ -45,6 +45,15 @@ const Admin = () => {
   const [promoLoading, setPromoLoading] = useState(true);
   const [savingPromo, setSavingPromo] = useState(false);
   const [promoError, setPromoError] = useState<string | null>(null);
+
+  const [regenerateLoading, setRegenerateLoading] = useState(false);
+  const [regenerateResult, setRegenerateResult] = useState<{
+    patch: string;
+    regenerated: string[];
+    skipped: string[];
+    failed: string[];
+  } | null>(null);
+  const [regenerateError, setRegenerateError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -215,6 +224,26 @@ const Admin = () => {
       setPromoError(err instanceof Error ? err.message : "Falha ao encerrar a promoção.");
     } finally {
       setSavingPromo(false);
+    }
+  };
+
+  const handleRegenerateMatchupPages = async () => {
+    const token = getAccessToken();
+    if (!token) return;
+    setRegenerateLoading(true);
+    setRegenerateError(null);
+    try {
+      const res = await fetch("/api/admin/matchup-pages/regenerate", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Falha ao regenerar páginas de matchup");
+      setRegenerateResult(data);
+    } catch (err) {
+      setRegenerateError(err instanceof Error ? err.message : "Falha ao regenerar páginas de matchup");
+    } finally {
+      setRegenerateLoading(false);
     }
   };
 
@@ -488,6 +517,37 @@ const Admin = () => {
           )}
 
           {promoError && <p className="text-xs text-threat">{promoError}</p>}
+        </div>
+
+        <div className="surface-1 border border-border rounded-lg p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <RefreshCw className="w-4 h-4 text-brand" />
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">Páginas de Matchup (SEO)</h2>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Regenera as páginas públicas de /matchups cujo patch salvo ficou desatualizado em relação ao patch atual
+            do Data Dragon. Páginas já atualizadas para o patch atual são puladas — chama a IA só pro que
+            realmente mudou.
+          </p>
+
+          <button
+            onClick={handleRegenerateMatchupPages}
+            disabled={regenerateLoading}
+            className="px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-brand text-primary-foreground shadow-brand disabled:cursor-not-allowed disabled:opacity-60 flex items-center gap-2"
+          >
+            {regenerateLoading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+            Regenerar páginas desatualizadas
+          </button>
+
+          {regenerateResult && (
+            <p className="text-xs text-foreground/80">
+              Patch {regenerateResult.patch}: {regenerateResult.regenerated.length} regenerada(s),{" "}
+              {regenerateResult.skipped.length} já atualizada(s), {regenerateResult.failed.length} falharam.
+              {regenerateResult.failed.length > 0 && ` (${regenerateResult.failed.join(", ")})`}
+            </p>
+          )}
+
+          {regenerateError && <p className="text-xs text-threat">{regenerateError}</p>}
         </div>
       </div>
     </div>
