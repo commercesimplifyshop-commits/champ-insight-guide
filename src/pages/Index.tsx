@@ -60,6 +60,36 @@ const Index = () => {
     };
   }, []);
 
+  // Prefill from a /matchups SEO page's "gerar plano completo" CTA, e.g.
+  // /?role=top&ally=Yasuo&enemy=Zed — resolves the ids against the same
+  // champion search endpoint ChampionPicker/ChampionSheet already use.
+  useEffect(() => {
+    const prefillRole = searchParams.get("role");
+    const prefillAlly = searchParams.get("ally");
+    const prefillEnemy = searchParams.get("enemy");
+    const validRoles: Role[] = ["top", "jungle", "mid", "adc", "support"];
+    if (!prefillRole || !prefillAlly || !validRoles.includes(prefillRole as Role)) return;
+
+    setRole(prefillRole as Role);
+
+    const resolveChampion = async (id: string): Promise<Champion | null> => {
+      try {
+        const res = await fetch(`/api/${locale}/champions?q=${encodeURIComponent(id)}`, {
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) return null;
+        const list: Champion[] = await res.json();
+        return list.find((c) => c.id.toLowerCase() === id.toLowerCase()) ?? null;
+      } catch {
+        return null;
+      }
+    };
+
+    resolveChampion(prefillAlly).then((c) => c && setAlly(c));
+    if (prefillEnemy) resolveChampion(prefillEnemy).then((c) => c && setEnemy(c));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // "RECENTES" on the home form — only real data: premium users' saved
   // analyses. No fabricated winrate (the API never computes one).
   useEffect(() => {

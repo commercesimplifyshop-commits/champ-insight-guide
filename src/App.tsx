@@ -14,6 +14,8 @@ import Pricing from "./pages/Pricing";
 import Admin from "./pages/Admin";
 import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
+import MatchupsHub from "./pages/MatchupsHub";
+import MatchupPage from "./pages/MatchupPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,8 @@ const App = () => (
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/privacy" element={<Privacy />} />
+                <Route path="/matchups" element={<MatchupsHub />} />
+                <Route path="/matchups/:role/:champSlug" element={<MatchupPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
