@@ -11,6 +11,7 @@ import { getRecaptchaToken } from "@/lib/recaptcha";
 import { isAdsenseConfigured, requestRewardedAd } from "@/lib/adsense";
 import { recommendStyles } from "@/lib/playstyleRecommendation";
 import Seo from "@/components/seo/Seo";
+import AboutSection from "@/components/marketing/AboutSection";
 
 import RoleSelector from "@/components/matchup/RoleSelector";
 import PlaystyleSelector from "@/components/matchup/PlaystyleSelector";
@@ -612,6 +613,7 @@ const Index = () => {
                 )}
               </>
             )}
+            <AboutSection />
           </div>
         ) : (
           <div className="space-y-4">
