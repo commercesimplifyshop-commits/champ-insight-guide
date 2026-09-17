@@ -283,6 +283,29 @@ const translations = {
   "contact.send": { pt: "Enviar Mensagem", en: "Send Message" },
   "contact.success": { pt: "Mensagem enviada! Vamos responder no email informado.", en: "Message sent! We'll reply to the email you provided." },
   "contact.error": { pt: "Não foi possível enviar sua mensagem. Tente novamente em instantes.", en: "Couldn't send your message. Please try again shortly." },
+
+  // About/SEO section on the homepage — real static copy for search engines
+  // and LLM crawlers, not just the interactive tool.
+  "about.title": { pt: "O que é o MATCHUP.GG", en: "What is MATCHUP.GG" },
+  "about.intro": {
+    pt: "MATCHUP.GG é uma ferramenta de IA para jogadores de League of Legends que querem entrar na partida sabendo exatamente o que fazer. Escolha sua role, seu campeão e, se quiser, o campeão inimigo — a IA gera um plano estratégico completo com power spikes, itemização e os erros mais comuns a evitar naquele matchup, além de counter finder e análise de composição 5v5.",
+    en: "MATCHUP.GG is an AI tool for League of Legends players who want to walk into their game already knowing what to do. Pick your role, your champion and, if you want, the enemy champion — the AI generates a full strategic plan with power spikes, itemization, and the most common mistakes to avoid in that matchup, plus a counter finder and 5v5 team composition analysis.",
+  },
+  "about.step1Title": { pt: "1. Escolha campeão e role", en: "1. Pick your champion and role" },
+  "about.step1Body": {
+    pt: "Selecione sua lane e seu campeão. Se já souber o adversário, informe o campeão inimigo para um plano de matchup específico — ou gere um plano solo, sem oponente definido.",
+    en: "Select your lane and champion. If you already know the opponent, add the enemy champion for a matchup-specific plan — or generate a solo plan with no set opponent.",
+  },
+  "about.step2Title": { pt: "2. A IA analisa o confronto", en: "2. The AI analyzes the matchup" },
+  "about.step2Body": {
+    pt: "O plano é gerado com base em dados reais do campeão — habilidades, atributos e dicas oficiais — do patch atual, em vez de depender só da memória de treinamento do modelo.",
+    en: "The plan is grounded in real per-champion data — abilities, stats, and official tips — for the current patch, instead of relying only on the model's training memory.",
+  },
+  "about.step3Title": { pt: "3. Jogue com um plano na mão", en: "3. Play with a plan in hand" },
+  "about.step3Body": {
+    pt: "Receba power spikes, prioridades de itemização, erros comuns a evitar e, na selva, rotas de pathing e controle de objetivos. O plano gratuito cobre o essencial; o Premium libera a análise completa.",
+    en: "Get power spikes, itemization priorities, common mistakes to avoid, and, for jungle, pathing routes and objective control. The free plan covers the essentials; Premium unlocks the full analysis.",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
