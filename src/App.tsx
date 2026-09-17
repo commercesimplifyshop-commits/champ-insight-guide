@@ -16,6 +16,10 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import MatchupsHub from "./pages/MatchupsHub";
 import MatchupPage from "./pages/MatchupPage";
+import ChampionsHub from "./pages/ChampionsHub";
+import ChampionWiki from "./pages/ChampionWiki";
+import Glossary from "./pages/Glossary";
+import GlossaryTerm from "./pages/GlossaryTerm";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +44,10 @@ const App = () => (
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/matchups" element={<MatchupsHub />} />
                 <Route path="/matchups/:role/:champSlug" element={<MatchupPage />} />
+                <Route path="/campeoes" element={<ChampionsHub />} />
+                <Route path="/campeoes/:championId" element={<ChampionWiki />} />
+                <Route path="/glossario" element={<Glossary />} />
+                <Route path="/glossario/:slug" element={<GlossaryTerm />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
