@@ -64,6 +64,8 @@ const translations = {
   "nav.draft": { pt: "Draft 5v5", en: "5v5 draft" },
   "nav.coach": { pt: "Coach IA", en: "AI Coach" },
   "nav.counters": { pt: "Counters por campeão", en: "Champion counters" },
+  "nav.champions": { pt: "Todos os campeões", en: "All champions" },
+  "nav.glossary": { pt: "Dicionário de LoL", en: "LoL glossary" },
   "nav.pricing": { pt: "Planos e preços", en: "Plans & pricing" },
   "nav.profile": { pt: "Perfil", en: "Profile" },
   "recents.title": { pt: "Recentes", en: "Recent" },

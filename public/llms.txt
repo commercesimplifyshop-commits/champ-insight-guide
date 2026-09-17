@@ -20,6 +20,9 @@ MATCHUP.GG is a web app (https://www.matchupgg.com) for League of Legends player
 ## Pages
 
 - [Home / app](https://www.matchupgg.com/): the matchup, solo, counter finder, and draft tools.
+- [Matchups](https://www.matchupgg.com/matchups): pre-generated matchup/solo guides for a curated list of popular champions.
+- [Champion guides](https://www.matchupgg.com/campeoes): a wiki-style page for every League of Legends champion — real Riot Data Dragon data (lore, stats, full ability kit, official tips), not AI-generated.
+- [Glossary](https://www.matchupgg.com/glossario): hand-written definitions of League of Legends strategy concepts (wave management, power spike, zoning, roaming, split push, etc.).
 - [Pricing](https://www.matchupgg.com/pricing): free vs Premium feature comparison and checkout.
 - [Contact](https://www.matchupgg.com/contact): support form.
 - [Privacy Policy](https://www.matchupgg.com/privacy): data handling and cookie policy.
