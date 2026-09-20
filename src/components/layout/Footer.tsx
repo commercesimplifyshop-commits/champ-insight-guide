@@ -16,6 +16,20 @@ const Footer = ({ patch }: FooterProps) => {
           <Sparkles className="w-3 h-3" />
           {t("footer.poweredByAi")}
         </p>
+        <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 py-1">
+          {[
+            { to: "/", label: t("nav.matchup") },
+            { to: "/modo-solo", label: t("nav.soloShort") },
+            { to: "/matchups", label: t("nav.matchupGuides") },
+            { to: "/campeoes", label: t("nav.champions") },
+            { to: "/glossario", label: t("nav.glossary") },
+            { to: "/pricing", label: t("nav.pricing") },
+          ].map((l) => (
+            <Link key={l.to} to={l.to} className="text-xs font-medium text-ink-70 hover:text-foreground transition-colors">
+              {l.label}
+            </Link>
+          ))}
+        </nav>
         <p className="text-[11px] text-muted-foreground leading-relaxed max-w-2xl mx-auto text-center">
           {t("footer.disclaimer")}
         </p>
