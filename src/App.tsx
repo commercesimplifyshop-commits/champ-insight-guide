@@ -36,6 +36,7 @@ const App = () => (
               <CookieConsentBanner />
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/modo-solo" element={<Index initialSolo />} />
                 <Route path="/coach" element={<Coach />} />
                 <Route path="/account" element={<Account />} />
                 <Route path="/pricing" element={<Pricing />} />

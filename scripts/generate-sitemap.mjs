@@ -6,6 +6,7 @@ const API_BASE = "https://matchupgg-api.vercel.app/api";
 
 const STATIC_URLS = [
   { loc: "/", changefreq: "weekly", priority: "1.0" },
+  { loc: "/modo-solo", changefreq: "weekly", priority: "0.8" },
   { loc: "/pricing", changefreq: "weekly", priority: "0.8" },
   { loc: "/matchups", changefreq: "weekly", priority: "0.7" },
   { loc: "/campeoes", changefreq: "monthly", priority: "0.7" },
