@@ -25,7 +25,7 @@ const NavDrawer = ({ open, onClose, onOpenAuth }: NavDrawerProps) => {
 
   const links: { to: string; label: string; badge?: string; active: boolean }[] = [
     { to: "/", label: t("nav.matchup"), active: location.pathname === "/" && location.search === "" },
-    { to: "/?solo=1", label: t("nav.solo"), active: location.search === "?solo=1" },
+    { to: "/modo-solo", label: t("nav.solo"), active: location.pathname === "/modo-solo" || location.search === "?solo=1" },
     { to: "/?mode=team", label: t("nav.draft"), active: location.search === "?mode=team" },
     { to: "/coach", label: t("nav.coach"), badge: "PRO", active: location.pathname === "/coach" },
     { to: "/?mode=counters", label: t("nav.counters"), active: location.search === "?mode=counters" },

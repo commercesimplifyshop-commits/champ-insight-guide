@@ -32,7 +32,12 @@ export type AppMode = "matchup" | "counters" | "team";
 
 const VALID_MODES: AppMode[] = ["matchup", "counters", "team"];
 
-const Index = () => {
+interface IndexProps {
+  /** Set by the /modo-solo route — a real URL/title for the solo feature so it can be indexed on its own. */
+  initialSolo?: boolean;
+}
+
+const Index = ({ initialSolo = false }: IndexProps) => {
   const [searchParams] = useSearchParams();
   const initialMode = searchParams.get("mode");
   const [mode, setMode] = useState<AppMode>(
@@ -41,7 +46,7 @@ const Index = () => {
   const [role, setRole] = useState<Role | null>(null);
   const [ally, setAlly] = useState<Champion | null>(null);
   const [enemy, setEnemy] = useState<Champion | null>(null);
-  const [soloMode, setSoloMode] = useState(searchParams.get("solo") === "1");
+  const [soloMode, setSoloMode] = useState(initialSolo || searchParams.get("solo") === "1");
   const [playstyle, setPlaystyle] = useState<PlayStyle | null>(null);
   const [macroStyle, setMacroStyle] = useState<MacroStyle | null>(null);
   const [loading, setLoading] = useState(false);
@@ -407,11 +412,19 @@ const Index = () => {
 
   return (
     <div className="min-h-screen app-bg">
-      <Seo
-        title="MATCHUP.GG — Estratégias de League of Legends com IA"
-        description="Análises de matchup, counters e estratégia de time para League of Legends geradas por IA. Planos táticos por campeão, role e fase do jogo."
-        path="/"
-      />
+      {initialSolo ? (
+        <Seo
+          title="Modo Solo — Plano de Campeão sem Adversário"
+          description="Gere um plano estratégico completo para o seu campeão e role sem precisar informar um adversário: power spikes, itemização e erros a evitar, por IA."
+          path="/modo-solo"
+        />
+      ) : (
+        <Seo
+          title="MATCHUP.GG — Estratégias de League of Legends com IA"
+          description="Análises de matchup, counters e estratégia de time para League of Legends geradas por IA. Planos táticos por campeão, role e fase do jogo."
+          path="/"
+        />
+      )}
       <Header onLogoClick={handleReset} />
       {!plan && <NavStrip items={navItems} />}
 
