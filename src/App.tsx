@@ -1,9 +1,10 @@
+import type { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
+import { HelmetProvider, type HelmetServerState } from "react-helmet-async";
 import { I18nProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
 import CookieConsentBanner from "@/components/layout/CookieConsentBanner";
@@ -20,43 +21,64 @@ import ChampionsHub from "./pages/ChampionsHub";
 import ChampionWiki from "./pages/ChampionWiki";
 import Glossary from "./pages/Glossary";
 import GlossaryTerm from "./pages/GlossaryTerm";
+import Guides from "./pages/Guides";
+import GuideArticle from "./pages/GuideArticle";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <HelmetProvider>
+export const AppRoutes = () => (
+  <Routes>
+    <Route path="/" element={<Index />} />
+    <Route path="/modo-solo" element={<Index initialSolo />} />
+    <Route path="/coach" element={<Coach />} />
+    <Route path="/account" element={<Account />} />
+    <Route path="/pricing" element={<Pricing />} />
+    <Route path="/admin" element={<Admin />} />
+    <Route path="/contact" element={<Contact />} />
+    <Route path="/privacy" element={<Privacy />} />
+    <Route path="/matchups" element={<MatchupsHub />} />
+    <Route path="/matchups/:role/:champSlug" element={<MatchupPage />} />
+    <Route path="/campeoes" element={<ChampionsHub />} />
+    <Route path="/campeoes/:championId" element={<ChampionWiki />} />
+    <Route path="/glossario" element={<Glossary />} />
+    <Route path="/glossario/:slug" element={<GlossaryTerm />} />
+    <Route path="/guias" element={<Guides />} />
+    <Route path="/guias/:slug" element={<GuideArticle />} />
+    <Route path="*" element={<NotFound />} />
+  </Routes>
+);
+
+/** Shared by the browser entry and the build-time prerender (src/entry-server.tsx), which supplies its own router. */
+export const AppProviders = ({
+  children,
+  helmetContext,
+}: {
+  children: ReactNode;
+  helmetContext?: { helmet?: HelmetServerState };
+}) => (
+  <HelmetProvider context={helmetContext}>
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
         <AuthProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter>
-              <CookieConsentBanner />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/modo-solo" element={<Index initialSolo />} />
-                <Route path="/coach" element={<Coach />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="/pricing" element={<Pricing />} />
-                <Route path="/admin" element={<Admin />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/matchups" element={<MatchupsHub />} />
-                <Route path="/matchups/:role/:champSlug" element={<MatchupPage />} />
-                <Route path="/campeoes" element={<ChampionsHub />} />
-                <Route path="/campeoes/:championId" element={<ChampionWiki />} />
-                <Route path="/glossario" element={<Glossary />} />
-                <Route path="/glossario/:slug" element={<GlossaryTerm />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
+            {children}
           </TooltipProvider>
         </AuthProvider>
       </I18nProvider>
     </QueryClientProvider>
   </HelmetProvider>
+);
+
+const App = () => (
+  <AppProviders>
+    <BrowserRouter>
+      <CookieConsentBanner />
+      <AppRoutes />
+    </BrowserRouter>
+  </AppProviders>
 );
 
 export default App;

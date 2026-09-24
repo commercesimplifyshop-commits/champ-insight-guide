@@ -39,6 +39,7 @@ const MatchupsHub = () => {
         title="Matchups de League of Legends"
         description="Guias de matchup e counter para os campeões mais jogados de League of Legends, gerados por IA — top, selva, mid, atirador e suporte."
         path="/matchups"
+        noindex={items !== null && items.length === 0}
       />
       <Header />
 

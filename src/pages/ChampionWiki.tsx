@@ -57,7 +57,11 @@ const ChampionWiki = () => {
 
   return (
     <div className="min-h-screen app-bg flex flex-col">
-      <Seo title={title} description={description} path={`/campeoes/${championId}`} noindex={notFound} />
+      {/* noindex: lore/abilities/tips are Riot's Data Dragon text, published
+          verbatim on thousands of sites — AdSense flagged the site as "low value
+          content" with these making up most of the sitemap. Re-enable indexing
+          per page only once it carries original analysis of our own. */}
+      <Seo title={title} description={description} path={`/campeoes/${championId}`} noindex />
       <Header />
 
       <main className="flex-1 max-w-3xl mx-auto px-4 py-6 space-y-4 w-full">

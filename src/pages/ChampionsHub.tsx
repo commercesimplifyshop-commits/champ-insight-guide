@@ -25,6 +25,7 @@ const ChampionsHub = () => {
         title="Todos os Campeões de League of Legends"
         description="Guias de todos os campeões de League of Legends: habilidades, atributos, lore e dicas oficiais de como jogar com e contra cada um."
         path="/campeoes"
+        noindex
       />
       <Header />
 

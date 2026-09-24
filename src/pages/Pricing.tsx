@@ -17,7 +17,7 @@ interface FeatureRow {
 }
 
 const FEATURES: FeatureRow[] = [
-  { label: "Resultado mais avançado", free: false, pro: true },
+  { label: "Plano completo, sem prévia cortada", free: false, pro: true },
   { label: "Matchup 1v1 — overview, early game e power spikes", free: true, pro: true },
   { label: "Matchup 1v1 — mid/late game, itemização e erros a evitar", free: false, pro: true },
   { label: "Modo solo (plano de campeão sem adversário)", free: true, pro: true },
@@ -116,8 +116,8 @@ const Pricing = () => {
               <PromoCountdown className="mt-1.5" />
             </div>
             <p className="text-xs text-foreground/80 leading-relaxed">
-              Análise completa (1v1, 5v5, Counter Finder) com um modelo de IA mais avançado — respostas mais
-              detalhadas e aprofundadas —, histórico salvo e estatísticas de uso.
+              Análise completa (1v1, modo solo, 5v5, Counter Finder): o plano inteiro, sem prévia cortada — mid e
+              late game, itemização e erros a evitar —, e sua última análise salva.
             </p>
             <button
               onClick={handleSubscribe}

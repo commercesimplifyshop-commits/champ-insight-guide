@@ -29,6 +29,7 @@ const NavDrawer = ({ open, onClose, onOpenAuth }: NavDrawerProps) => {
     { to: "/?mode=team", label: t("nav.draft"), active: location.search === "?mode=team" },
     { to: "/coach", label: t("nav.coach"), badge: "PRO", active: location.pathname === "/coach" },
     { to: "/?mode=counters", label: t("nav.counters"), active: location.search === "?mode=counters" },
+    { to: "/guias", label: t("nav.guides"), active: location.pathname.startsWith("/guias") },
     { to: "/campeoes", label: t("nav.champions"), active: location.pathname.startsWith("/campeoes") },
     { to: "/glossario", label: t("nav.glossary"), active: location.pathname.startsWith("/glossario") },
     { to: "/pricing", label: t("nav.pricing"), active: location.pathname === "/pricing" },
