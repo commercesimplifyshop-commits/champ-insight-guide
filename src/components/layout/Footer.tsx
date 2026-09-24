@@ -20,7 +20,7 @@ const Footer = ({ patch }: FooterProps) => {
           {[
             { to: "/", label: t("nav.matchup") },
             { to: "/modo-solo", label: t("nav.soloShort") },
-            { to: "/matchups", label: t("nav.matchupGuides") },
+            { to: "/guias", label: t("nav.guides") },
             { to: "/campeoes", label: t("nav.champions") },
             { to: "/glossario", label: t("nav.glossary") },
             { to: "/pricing", label: t("nav.pricing") },

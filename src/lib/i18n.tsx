@@ -65,6 +65,7 @@ const translations = {
   "nav.coach": { pt: "Coach IA", en: "AI Coach" },
   "nav.counters": { pt: "Counters por campeão", en: "Champion counters" },
   "nav.matchupGuides": { pt: "Guias de matchup", en: "Matchup guides" },
+  "nav.guides": { pt: "Guias de LoL", en: "LoL guides" },
   "nav.champions": { pt: "Todos os campeões", en: "All champions" },
   "nav.glossary": { pt: "Dicionário de LoL", en: "LoL glossary" },
   "nav.pricing": { pt: "Planos e preços", en: "Plans & pricing" },
@@ -108,13 +109,13 @@ const translations = {
   "team.objectives": { pt: "OBJETIVOS", en: "OBJECTIVES" },
   "team.baron": { pt: "Barão", en: "Baron" },
   "paywall.perk1": { pt: "Análises ilimitadas, sem espera", en: "Unlimited analyses, no waiting" },
-  "paywall.perk2": { pt: "Modelo de IA mais avançado", en: "More advanced AI model" },
-  "paywall.perk3": { pt: "Histórico salvo e estatísticas de uso", en: "Saved history and usage stats" },
+  "paywall.perk2": { pt: "Plano completo: mid/late game, build e erros", en: "Full plan: mid/late game, build and mistakes" },
+  "paywall.perk3": { pt: "Sua última análise salva", en: "Your latest analysis saved" },
   "paywall.cta": { pt: "Assinar · R$ 19,90/mês", en: "Subscribe · $19.90/mo" },
   "paywall.continueFree": { pt: "Continuar no Free", en: "Continue on Free" },
   "paywall.description": {
-    pt: "No Premium a IA gera o plano completo, sem prévia truncada, com um modelo mais avançado e histórico salvo.",
-    en: "On Premium the AI generates the full plan, no truncated preview, with a more advanced model and saved history.",
+    pt: "No Premium a IA gera o plano completo, sem prévia truncada, e sua última análise fica salva.",
+    en: "On Premium the AI generates the full plan, no truncated preview, and your latest analysis is saved.",
   },
 
   // Difficulty labels
